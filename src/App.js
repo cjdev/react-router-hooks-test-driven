@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import ProductionDependencyProvider from "./dependencies/ProductionDependencyProvider";
+import ProductionDependencyProvider from "./dependency/ProductionDependencyProvider";
 import TopLevel from "./TopLevel";
 
 const App = () =>

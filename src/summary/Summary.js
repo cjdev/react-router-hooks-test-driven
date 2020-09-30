@@ -1,6 +1,16 @@
 import React from 'react';
-import ClassNames from "../constants/ClassNames";
+import useSummary from './useSummary'
 
-const Summary = () => <div className={ClassNames.NOT_IMPLEMENTED}>Summary Component</div>
+const Summary = () => {
+    const summary = useSummary()
+    const {numberOfProfiles, numberOfTasks} = summary
+
+    return (
+        <div className={"Summary"}>
+            <span>Number of profiles = {numberOfProfiles}</span>
+            <span>Number of tasks across all profiles = {numberOfTasks}</span>
+        </div>
+    )
+};
 
 export default Summary;
