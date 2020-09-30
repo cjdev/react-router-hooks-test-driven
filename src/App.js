@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
 import ProductionDependencyProvider from "./dependencies/ProductionDependencyProvider";
-import TopLevelComponent from "./TopLevelComponent";
+import TopLevel from "./TopLevel";
 
 const App = () =>
     <div>
         <ProductionDependencyProvider>
-            <TopLevelComponent/>
+            <TopLevel/>
         </ProductionDependencyProvider>
     </div>
 
