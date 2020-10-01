@@ -19,7 +19,8 @@ const createDatabase = fetchFunction => {
         return elements.length
     }
     const database = {
-        count
+        count,
+        list
     }
     return database
 }
