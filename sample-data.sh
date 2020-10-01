@@ -3,9 +3,9 @@
 set -e
 set -x
 
-home_id=`curl -X POST -d '{ "name": "home" }' http://localhost:8080/profile`
-work_id=`curl -X POST -d '{ "name": "work" }' http://localhost:8080/profile`
-vacation_id=`curl -X POST -d '{ "name": "vacation" }' http://localhost:8080/profile`
+home_id=$(curl -X POST -d '{ "name": "home" }' http://localhost:8080/profile)
+work_id=$(curl -X POST -d '{ "name": "work" }' http://localhost:8080/profile)
+vacation_id=$(curl -X POST -d '{ "name": "vacation" }' http://localhost:8080/profile)
 
 curl -X POST -d "{ \"profile\": \"${home_id}\"    , \"name\":\"Remodel House\", \"complete\":false }" http://localhost:8080/task
 curl -X POST -d "{ \"profile\": \"${home_id}\"    , \"name\":\"Install Bunker\", \"complete\":false }" http://localhost:8080/task

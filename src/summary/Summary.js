@@ -1,3 +1,4 @@
+import './Summary.css'
 import React from 'react';
 import useSummary from './useSummary'
 
