@@ -1,6 +1,22 @@
 import React from 'react';
-import ClassNames from "../constants/ClassNames";
+import useDependencies from "../dependency/useDependencies";
+import {Redirect, Route, Router, Switch} from "react-router-dom";
 
-const Routes = () => <div className={ClassNames.NOT_IMPLEMENTED}>Routes Component</div>
+const Routes = () => {
+    const {history, Profile, Task} = useDependencies()
+    return <Router history={history}>
+        <Switch>
+            <Route path="/profile">
+                <Profile/>
+            </Route>
+            <Route path="/task">
+                <Task/>
+            </Route>
+            <Route>
+                <Redirect to="/profile"/>
+            </Route>
+        </Switch>
+    </Router>
+}
 
 export default Routes;

@@ -5,12 +5,16 @@ import Summary from '../summary/Summary'
 import createBackend from '../backend/backend'
 import SummaryProvider from "../summary/SummaryProvider";
 import createDatabase from "../backend/database";
+import {createBrowserHistory} from 'history';
+import Task from "../task/Task";
+import Profile from "../profile/Profile";
 
 const ProductionDependencyProvider = ({children}) => {
     const fetchContract = fetch
     const database = createDatabase(fetchContract)
     const backend = createBackend(database)
-    const dependencies = {backend, Routes, Summary}
+    const history = createBrowserHistory()
+    const dependencies = {backend, Routes, Summary, history, Task, Profile}
 
     return (
         <DependencyContext.Provider value={dependencies}>
