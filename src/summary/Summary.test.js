@@ -11,7 +11,7 @@ import useSummary from "./useSummary";
 test('render summary', async () => {
     const fetchSummary = jest.fn().mockResolvedValueOnce({
         numberOfProfiles: 123,
-        numberOfTasks: 456
+        numberOfTasksAcrossAllProfiles: 456
     })
     const backend = {
         fetchSummary
@@ -41,8 +41,8 @@ test('update summary', async () => {
         </div>
     }
     const fetchSummary = jest.fn()
-        .mockResolvedValueOnce({numberOfProfiles: 1, numberOfTasks: 2})
-        .mockResolvedValueOnce({numberOfProfiles: 3, numberOfTasks: 4})
+        .mockResolvedValueOnce({numberOfProfiles: 1, numberOfTasksAcrossAllProfiles: 2})
+        .mockResolvedValueOnce({numberOfProfiles: 3, numberOfTasksAcrossAllProfiles: 4})
     const backend = {
         fetchSummary
     }

@@ -7,6 +7,7 @@
 ```bash
 npx create-react-app react-router-hooks-test-driven
 cd react-router-hooks-test-driven
+npm install ramda --save
 ```
 
 ## Testing Reference

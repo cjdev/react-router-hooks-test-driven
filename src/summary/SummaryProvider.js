@@ -8,9 +8,9 @@ const SummaryProvider = ({children}) => {
     const [numberOfTasks, setNumberOfTasks] = useState(0);
 
     const updateSummary = async () => {
-        const summary = await backend.fetchSummary();
-        setNumberOfTasks(summary.numberOfTasks);
-        setNumberOfProfiles(summary.numberOfProfiles);
+        const {numberOfProfiles, numberOfTasksAcrossAllProfiles} = await backend.fetchSummary();
+        setNumberOfProfiles(numberOfProfiles);
+        setNumberOfTasks(numberOfTasksAcrossAllProfiles);
     }
 
     useEffect(() => {
