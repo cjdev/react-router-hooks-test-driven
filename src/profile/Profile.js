@@ -1,11 +1,12 @@
-import React, {useState, useEffect} from "react";
+import './Profile.css'
+import React, {useEffect, useState} from "react";
 import useDependencies from "../dependency/useDependencies";
 import useSummary from "../summary/useSummary";
 import ProfileList from "./ProfileList";
 import AddProfile from "./AddProfile";
 
 const pluralize = ({quantity, singular, plural}) => {
-    if(quantity === 1) {
+    if (quantity === 1) {
         return singular
     } else {
         return plural
@@ -24,8 +25,8 @@ const Profile = () => {
     useEffect(() => {
         loadProfiles()
     }, [])
-    return <div className={'ProfilePage'}>
-        <h2>{profiles.length} {pluralize({quantity:profiles.length, singular:'profile', plural:'profiles'})}</h2>
+    return <div className={'Profile'}>
+        <h2>{profiles.length} {pluralize({quantity: profiles.length, singular: 'profile', plural: 'profiles'})}</h2>
         <ProfileList profiles={profiles}/>
         <AddProfile loadProfiles={loadProfiles} backend={backend}/>
     </div>
