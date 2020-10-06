@@ -1,0 +1,14 @@
+[
+  {
+    "name": "home",
+    "id": "profile-1"
+  },
+  {
+    "name": "work",
+    "id": "profile-2"
+  },
+  {
+    "name": "vacation",
+    "id": "profile-3"
+  }
+]

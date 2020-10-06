@@ -22,12 +22,16 @@ const Profile = () => {
         await summaryContext.updateSummary();
         setProfiles(latestProfiles)
     }
+    const deleteProfile = async id => {
+        await backend.deleteProfileAndCorrespondingTasks(id)
+        await loadProfiles()
+    }
     useEffect(() => {
         loadProfiles()
     }, [])
     return <div className={'Profile'}>
         <h2>{profiles.length} {pluralize({quantity: profiles.length, singular: 'profile', plural: 'profiles'})}</h2>
-        <ProfileList profiles={profiles}/>
+        <ProfileList profiles={profiles} deleteProfile={deleteProfile}/>
         <AddProfile loadProfiles={loadProfiles} backend={backend}/>
     </div>
 }

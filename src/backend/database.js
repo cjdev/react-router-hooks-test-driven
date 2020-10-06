@@ -18,9 +18,15 @@ const createDatabase = fetchFunction => {
         const elements = await list(namespace)
         return elements.length
     }
+    const remove = async ({namespace, id}) => {
+        const method = 'DELETE';
+        const uri = namespace + '/' + id
+        return await fetchText(uri, {method})
+    }
     const database = {
         count,
-        list
+        list,
+        remove
     }
     return database
 }

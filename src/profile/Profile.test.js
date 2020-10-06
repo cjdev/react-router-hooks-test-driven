@@ -84,7 +84,7 @@ test('add profile', async () => {
         </DependencyContext.Provider>)
         userEvent.type(rendered.getByPlaceholderText('new profile'), 'profile name')
     })
-    let updateSummaryCallsBeforeAddingNewProfile = updateSummary.mock.calls.length
+    const updateSummaryCallsBeforeAddingNewProfile = updateSummary.mock.calls.length
     await act(async () => {
         fireEvent.keyUp(rendered.getByPlaceholderText('new profile'), {key: 'Enter', code: 'Enter'})
         expect(updateSummary.mock.calls.length).toEqual(1)
@@ -93,4 +93,46 @@ test('add profile', async () => {
     expect(rendered.getByText('home')).toBeInTheDocument()
     expect(rendered.getByText('profile name')).toBeInTheDocument()
     expect(updateSummary.mock.calls.length).toEqual(updateSummaryCallsBeforeAddingNewProfile + 1)
+});
+
+test('delete profile', async () => {
+    const profile1 = {
+        "name": "profile-name-1",
+        "id": "profile-id-1"
+    }
+    const profile2 = {
+        "name": "profile-name-2",
+        "id": "profile-id-2"
+    }
+    const profile3 = {
+        "name": "profile-name-3",
+        "id": "profile-id-3"
+    }
+    const profilesBefore = [profile1, profile2, profile3]
+    const profilesAfter = [profile1, profile3]
+    const listProfiles = jest.fn()
+        .mockResolvedValueOnce(profilesBefore)
+        .mockResolvedValueOnce(profilesAfter)
+    const deleteProfileAndCorrespondingTasks = jest.fn()
+    const backend = {listProfiles, deleteProfileAndCorrespondingTasks}
+    const updateSummary = jest.fn()
+    let rendered;
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Profile/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+    })
+    const updateSummaryCallsBeforeDeletingProfile = updateSummary.mock.calls.length
+    await act(async () => {
+        const buttonForProfile2 = rendered.getByLabelText('profile-name-2')
+        userEvent.click(buttonForProfile2)
+        expect(updateSummary.mock.calls.length).toEqual(1)
+    })
+    expect(rendered.getByText('2 profiles')).toBeInTheDocument()
+    expect(rendered.getByText('profile-name-1')).toBeInTheDocument()
+    expect(rendered.getByText('profile-name-3')).toBeInTheDocument()
+    expect(updateSummary.mock.calls.length).toEqual(updateSummaryCallsBeforeDeletingProfile + 1)
+    expect(deleteProfileAndCorrespondingTasks.mock.calls).toEqual([['profile-id-2']])
 });

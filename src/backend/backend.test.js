@@ -2,63 +2,10 @@ import '@testing-library/jest-dom/extend-expect'
 import createBackend from "./backend";
 import Namespace from "../constants/Namespace";
 
-const sampleProfileResponse = `[ {
-  "name" : "home",
-  "id" : "profile-1"
-}, {
-  "name" : "work",
-  "id" : "profile-2"
-}, {
-  "name" : "vacation",
-  "id" : "profile-3"
-} ]`
-
-const sampleTaskResponse = `[ {
-  "profile" : "profile-1",
-  "name" : "Remodel House",
-  "complete" : false,
-  "id" : "task-1"
-}, {
-  "profile" : "profile-1",
-  "name" : "Install Bunker",
-  "complete" : false,
-  "id" : "task-2"
-}, {
-  "profile" : "profile-1",
-  "name" : "Stockpile Supplies",
-  "complete" : false,
-  "id" : "task-3"
-}, {
-  "profile" : "profile-2",
-  "name" : "Cure Cancer",
-  "complete" : false,
-  "id" : "task-4"
-}, {
-  "profile" : "profile-2",
-  "name" : "World Peace",
-  "complete" : false,
-  "id" : "task-5"
-}, {
-  "profile" : "profile-2",
-  "name" : "End Hunger",
-  "complete" : false,
-  "id" : "task-6"
-}, {
-  "profile" : "profile-3",
-  "name" : "Base jump from Mount Everest",
-  "complete" : false,
-  "id" : "task-7"
-}, {
-  "profile" : "profile-3",
-  "name" : "Toast marshmallows over volcano",
-  "complete" : false,
-  "id" : "task-8"
-}, {
-  "profile" : "profile-3",
-  "name" : "Dune buggy riding on Mars",
-  "complete" : false,
-  "id" : "task-9"
-} ]`
+test('descriptive error if no database', async () => {
+    // given
+    expect(() => createBackend()).toThrow('backend missing dependency database')
+})
 
 test('fetch summary', async () => {
     // given
@@ -102,4 +49,69 @@ test('list profiles', async () => {
 
     // then
     expect(actual).toEqual(profiles)
+})
+
+test('list tasks for profile', async () => {
+    // given
+    const profileId = 'relevant-profile-id'
+    const irrelevantTask = {
+        profile: 'some-other-profile-id',
+        name: 'irrelevant-task',
+        complete: false,
+        id: 'task-1'
+    }
+    const relevantTask = {
+        profile: profileId,
+        name: 'relevant-task',
+        complete: false,
+        id: 'task-2'
+    }
+    const tasks = [irrelevantTask, relevantTask]
+    const expected = [relevantTask]
+    const listResultMap = {
+        [Namespace.TASK]: tasks
+    }
+    const list = jest.fn().mockImplementation(key => listResultMap[key])
+    const database = {list}
+    const backend = createBackend(database)
+
+    // when
+    const actual = await backend.listTasksForProfile(profileId)
+
+    // then
+    expect(actual).toEqual(expected)
+})
+
+test('delete profile and corresponding tasks', async () => {
+    // given
+    const profileId = 'relevant-profile-id'
+    const irrelevantTask = {
+        profile: 'some-other-profile-id',
+        name: 'irrelevant-task',
+        complete: false,
+        id: 'irrelevant-task-id'
+    }
+    const relevantTask = {
+        profile: profileId,
+        name: 'relevant-task',
+        complete: false,
+        id: 'relevant-task-id'
+    }
+    const tasks = [irrelevantTask, relevantTask]
+    const expected = [relevantTask]
+    const listResultMap = {
+        [Namespace.TASK]: tasks
+    }
+    const list = jest.fn().mockImplementation(key => listResultMap[key])
+    const remove = jest.fn()
+    const database = {list, remove}
+    const backend = createBackend(database)
+
+    // when
+    await backend.deleteProfileAndCorrespondingTasks(profileId)
+
+    // then
+    expect(remove.mock.calls.length).toEqual(2)
+    expect(remove.mock.calls).toContainEqual([{namespace: 'profile', id: 'relevant-profile-id'}])
+    expect(remove.mock.calls).toContainEqual([{namespace: 'task', id: 'relevant-task-id'}])
 })
