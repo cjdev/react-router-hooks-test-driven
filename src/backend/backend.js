@@ -26,9 +26,14 @@ const createBackend = database => {
         return result
     }
 
+    const countInNamespace = async namespace => {
+        const items = await database.list(namespace)
+        return items.length
+    }
+
     const fetchSummary = async () => {
-        const numberOfProfiles = await database.list(Namespace.PROFILE).length;
-        const numberOfTasksAcrossAllProfiles = await database.list(Namespace.TASK).length;
+        const numberOfProfiles = await countInNamespace(Namespace.PROFILE);
+        const numberOfTasksAcrossAllProfiles = await countInNamespace(Namespace.TASK);
         return {numberOfProfiles, numberOfTasksAcrossAllProfiles};
     }
 

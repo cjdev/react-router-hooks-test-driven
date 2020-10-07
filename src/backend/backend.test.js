@@ -13,7 +13,7 @@ test('fetch summary', async () => {
         [Namespace.PROFILE]: [{}, {}, {}],
         [Namespace.TASK]: [{}, {}, {}, {}, {}]
     }
-    const list = jest.fn().mockImplementation(key => countResultMap[key])
+    const list = jest.fn().mockImplementation(key => Promise.resolve(countResultMap[key]))
     const database = {list}
     const backend = createBackend(database)
 
