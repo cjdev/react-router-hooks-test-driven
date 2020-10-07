@@ -10,23 +10,20 @@ const createDatabase = fetchFunction => {
         const json = JSON.parse(text);
         return json;
     }
-    const list = async namespace => {
-        const result = await fetchJson(namespace)
-        return result
-    }
-    const count = async namespace => {
-        const elements = await list(namespace)
-        return elements.length
-    }
-    const remove = async ({namespace, id}) => {
-        const method = 'DELETE';
-        const uri = namespace + '/' + id
-        return await fetchText(uri, {method})
-    }
+
+    const list = async namespace => await fetchJson(namespace)
+
+    const remove = async ({namespace, id}) => await fetchText(namespace + '/' + id, {method: 'DELETE'})
+
+    const get = async ({namespace, id}) => await fetchJson(namespace + '/' + id)
+
+    const add = async ({namespace, value}) => await fetchText(namespace, {method: 'POST', body: JSON.stringify(value)})
+
     const database = {
-        count,
         list,
-        remove
+        remove,
+        add,
+        get
     }
     return database
 }

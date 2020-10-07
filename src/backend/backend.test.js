@@ -10,19 +10,19 @@ test('descriptive error if no database', async () => {
 test('fetch summary', async () => {
     // given
     const countResultMap = {
-        [Namespace.PROFILE]: 123,
-        [Namespace.TASK]: 456
+        [Namespace.PROFILE]: [{}, {}, {}],
+        [Namespace.TASK]: [{}, {}, {}, {}, {}]
     }
-    const count = jest.fn().mockImplementation(key => countResultMap[key])
-    const database = {count}
+    const list = jest.fn().mockImplementation(key => countResultMap[key])
+    const database = {list}
     const backend = createBackend(database)
 
     // when
     const summary = await backend.fetchSummary()
 
     // then
-    expect(summary.numberOfProfiles).toEqual(123)
-    expect(summary.numberOfTasksAcrossAllProfiles).toEqual(456)
+    expect(summary.numberOfProfiles).toEqual(3)
+    expect(summary.numberOfTasksAcrossAllProfiles).toEqual(5)
 })
 
 test('list profiles', async () => {
@@ -114,4 +114,18 @@ test('delete profile and corresponding tasks', async () => {
     expect(remove.mock.calls.length).toEqual(2)
     expect(remove.mock.calls).toContainEqual([{namespace: 'profile', id: 'relevant-profile-id'}])
     expect(remove.mock.calls).toContainEqual([{namespace: 'task', id: 'relevant-task-id'}])
+})
+
+test('add profile', async () => {
+    // given
+    const profileName = 'profile-name'
+    const add = jest.fn()
+    const database = {add}
+    const backend = createBackend(database)
+
+    // when
+    await backend.addProfile(profileName)
+
+    // then
+    expect(add.mock.calls).toEqual([[{namespace: 'profile', value: {name: profileName}}]])
 })

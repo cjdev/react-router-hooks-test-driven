@@ -27,8 +27,8 @@ const createBackend = database => {
     }
 
     const fetchSummary = async () => {
-        const numberOfProfiles = await database.count(Namespace.PROFILE);
-        const numberOfTasksAcrossAllProfiles = await database.count(Namespace.TASK);
+        const numberOfProfiles = await database.list(Namespace.PROFILE).length;
+        const numberOfTasksAcrossAllProfiles = await database.list(Namespace.TASK).length;
         return {numberOfProfiles, numberOfTasksAcrossAllProfiles};
     }
 
@@ -43,11 +43,17 @@ const createBackend = database => {
         await Promise.all([deleteTasksFuture, deleteProfileFuture])
     }
 
+    const addProfile = async name => {
+        const profile = {name}
+        await database.add({namespace: Namespace.PROFILE, value: profile})
+    }
+
     const backend = {
         fetchSummary,
         listProfiles,
         listTasksForProfile,
-        deleteProfileAndCorrespondingTasks
+        deleteProfileAndCorrespondingTasks,
+        addProfile
     }
 
     return backend
