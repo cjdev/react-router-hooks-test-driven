@@ -6,6 +6,7 @@ import DependencyContext from "../dependency/DependencyContext";
 import SummaryContext from "../summary/SummaryContext";
 import {act} from "react-dom/test-utils"
 import * as R from 'ramda'
+import userEvent from '@testing-library/user-event'
 
 const alphabeticCompare = (a, b) => a.localeCompare(b, 'en')
 
@@ -99,19 +100,19 @@ test('render plural tasks', async () => {
         id: profileId,
         name: 'Profile Name'
     }
-    const task1 = {
+    const incompleteTask = {
         profile: profileId,
         "name": "Incomplete Task",
         "complete": false,
         "id": "task-1"
     }
-    const task2 = {
+    const completeTask = {
         profile: profileId,
         "name": "Complete Task",
         "complete": true,
         "id": "task-2"
     }
-    const tasks = [task1, task2]
+    const tasks = [incompleteTask, completeTask]
     const listTasksForProfileMap = {
         [profileId]: tasks
     }
@@ -200,4 +201,61 @@ test('mark task complete', async () => {
             }
         ]
     ])
+});
+
+test('clear complete', async () => {
+    const profileId = 'profile-id'
+    const windowLocationPathnameResult = `/task/${profileId}`
+    const windowContract = {
+        location: {
+            pathname: windowLocationPathnameResult
+        }
+    }
+    const profile = {
+        id: profileId,
+        name: 'Profile Name'
+    }
+    const completeTask = {
+        profile: profileId,
+        "name": "Complete Task",
+        "complete": true,
+        "id": "task-complete-id"
+    }
+    const incompleteTask = {
+        profile: profileId,
+        "name": "Incomplete Task",
+        "complete": false,
+        "id": "task-incomplete-id"
+    }
+    const oldTasks = [completeTask, incompleteTask]
+    const newTasks = [incompleteTask]
+    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
+    const getProfileMap = {
+        [profileId]: profile
+    }
+    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
+    const deleteTask = jest.fn()
+    const backend = {
+        listTasksForProfile,
+        getProfile,
+        deleteTask
+    }
+    const updateSummary = jest.fn()
+    let rendered;
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Task/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+    })
+    await act(async () => {
+        const clearCompleteButton = rendered.getByText('Clear Complete')
+        userEvent.click(clearCompleteButton)
+    })
+
+    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
+    expect(rendered.getByText('Incomplete Task')).toBeInTheDocument()
+    expect(rendered.getByText('Incomplete Task').className).toEqual('in-progress')
+    expect(deleteTask.mock.calls).toEqual([["task-complete-id"]])
 });

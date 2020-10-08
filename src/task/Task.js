@@ -2,6 +2,7 @@ import './Task.css'
 import React, {useEffect, useState} from "react";
 import useSummary from "../summary/useSummary";
 import useDependencies from "../dependency/useDependencies";
+import * as R from 'ramda'
 
 const pluralize = ({quantity, singular, plural}) => {
     if (quantity === 1) {
@@ -53,6 +54,14 @@ const Task = () => {
         await backend.updateTask(task)
         loadTasks()
     }
+    const onClearClick = async () => {
+        const isComplete = task => task.complete;
+        const completedTasks = R.filter(isComplete, tasks);
+        const completedTaskIds = R.map(R.prop('id'), completedTasks);
+        const promises = R.map(backend.deleteTask, completedTaskIds);
+        await Promise.all(promises);
+        return loadTasks();
+    }
     useEffect(() => {
         loadTasks()
     }, []);
@@ -60,6 +69,7 @@ const Task = () => {
         <h2>{tasks.length} {pluralize({quantity: tasks.length, singular: 'task', plural: 'tasks'})} in
             profile {profileName}</h2>
         <Tasks tasks={tasks} updateTask={updateTask}/>
+        <button onClick={onClearClick}>Clear Complete</button>
         <a href={'/profile'}>Profiles</a>
     </div>
 }
