@@ -180,7 +180,7 @@ test('get profile', async () => {
 test('update task', async () => {
     // given
     const value = {id: 'task-id', name: 'task-name'}
-    const update = jest.fn().mockResolvedValueOnce('')
+    const update = jest.fn()
     const database = {update}
     const backend = createBackend(database)
 
@@ -189,4 +189,19 @@ test('update task', async () => {
 
     // then
     expect(update.mock.calls).toEqual([[{namespace: Namespace.TASK, value}]])
+})
+
+test('delete task', async () => {
+    // given
+    const id = 'the-id'
+    const namespace = Namespace.TASK
+    const remove = jest.fn()
+    const database = {remove}
+    const backend = createBackend(database)
+
+    // when
+    await backend.deleteTask(id)
+
+    // then
+    expect(remove.mock.calls).toEqual([[{namespace: Namespace.TASK, id}]])
 })

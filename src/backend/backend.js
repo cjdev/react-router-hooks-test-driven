@@ -66,7 +66,8 @@ const createBackend = database => {
         deleteProfileAndCorrespondingTasks,
         addProfile,
         getProfile,
-        updateTask
+        updateTask,
+        deleteTask
     }
 
     return backend
