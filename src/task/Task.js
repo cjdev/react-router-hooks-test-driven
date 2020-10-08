@@ -21,13 +21,16 @@ const parseProfileId = pathName => {
     return profileId
 }
 
-const SingleTask = ({task}) => {
+const SingleTask = ({task, updateTask}) => {
     const completeClass = task.complete ? 'complete' : 'in-progress';
-    return <span className={completeClass}>{task.name}</span>
+    const onClick = () => {
+        updateTask({...task, complete: !task.complete})
+    }
+    return <span className={completeClass} onClick={onClick}>{task.name}</span>
 }
 
-const Tasks = ({tasks}) => {
-    const taskElements = tasks.map(task => <SingleTask key={task.id} task={task}/>)
+const Tasks = ({tasks, updateTask}) => {
+    const taskElements = tasks.map(task => <SingleTask key={task.id} task={task} updateTask={updateTask}/>)
     return <div className={'elements'}>{taskElements}</div>
 }
 
@@ -46,13 +49,17 @@ const Task = () => {
         await summaryContext.updateSummary();
         setTasks(tasksFromBackend)
     }
+    const updateTask = async task => {
+        await backend.updateTask(task)
+        loadTasks()
+    }
     useEffect(() => {
         loadTasks()
     }, []);
     return <div className={'Task'}>
         <h2>{tasks.length} {pluralize({quantity: tasks.length, singular: 'task', plural: 'tasks'})} in
             profile {profileName}</h2>
-        <Tasks tasks={tasks}/>
+        <Tasks tasks={tasks} updateTask={updateTask}/>
         <a href={'/profile'}>Profiles</a>
     </div>
 }
