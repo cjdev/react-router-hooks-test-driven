@@ -7,7 +7,6 @@ import SummaryContext from "../summary/SummaryContext";
 import {act} from "react-dom/test-utils"
 import * as R from 'ramda'
 
-
 const mapToJestFunction = resultMap => {
     const implementation = key => {
         if (R.includes(key, R.keys(resultMap))) {

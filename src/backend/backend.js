@@ -53,12 +53,15 @@ const createBackend = database => {
         await database.add({namespace: Namespace.PROFILE, value: profile})
     }
 
+    const getProfile = async id => await database.get({namespace: Namespace.PROFILE, id})
+
     const backend = {
         fetchSummary,
         listProfiles,
         listTasksForProfile,
         deleteProfileAndCorrespondingTasks,
-        addProfile
+        addProfile,
+        getProfile
     }
 
     return backend

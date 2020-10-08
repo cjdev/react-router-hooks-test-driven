@@ -1,6 +1,31 @@
 import '@testing-library/jest-dom/extend-expect'
 import createBackend from "./backend";
 import Namespace from "../constants/Namespace";
+import * as R from "ramda";
+
+const alphabeticCompare = (a, b) => a.localeCompare(b, 'en')
+
+const sortKeys = jsonObject => {
+    const unsortedKeys = R.keys(jsonObject)
+    const sortedKeys = R.sort(alphabeticCompare, unsortedKeys)
+    return R.pick(sortedKeys, jsonObject)
+}
+
+const jsonToKey = jsonObject => JSON.stringify(sortKeys(jsonObject))
+
+const mapWithJsonKeyToJestFunction = resultMap => {
+    const implementation = keyAsJsonObject => {
+        const key = jsonToKey(keyAsJsonObject)
+        if (R.includes(key, R.keys(resultMap))) {
+            return resultMap[key]
+        } else {
+            const keyDisplay = JSON.stringify(keyAsJsonObject)
+            const resultMapDisplay = JSON.stringify(resultMap)
+            throw `Key '${keyDisplay}' not found in map ${resultMapDisplay}`
+        }
+    }
+    return jest.fn().mockImplementation(implementation)
+}
 
 test('descriptive error if no database', async () => {
     // given
@@ -128,4 +153,26 @@ test('add profile', async () => {
 
     // then
     expect(add.mock.calls).toEqual([[{namespace: 'profile', value: {name: profileName}}]])
+})
+
+test('get profile', async () => {
+    // given
+    const namespace = Namespace.PROFILE
+    const id = 'profile-id'
+    const profile = {
+        "name": "home",
+        "id": "profile-1"
+    }
+    const getResultMap = {
+        [jsonToKey({id, namespace})]: profile
+    }
+    const get = mapWithJsonKeyToJestFunction(getResultMap)
+    const database = {get}
+    const backend = createBackend(database)
+
+    // when
+    const actual = await backend.getProfile(id)
+
+    // then
+    expect(actual).toEqual(profile)
 })
