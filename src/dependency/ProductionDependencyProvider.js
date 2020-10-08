@@ -14,7 +14,8 @@ const ProductionDependencyProvider = ({children}) => {
     const database = createDatabase(fetchContract)
     const backend = createBackend(database)
     const history = createBrowserHistory()
-    const dependencies = {backend, Routes, Summary, history, Task, Profile}
+    const windowContract = window
+    const dependencies = {backend, Routes, Summary, history, Task, Profile, windowContract}
 
     return (
         <DependencyContext.Provider value={dependencies}>

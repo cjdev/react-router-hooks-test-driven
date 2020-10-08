@@ -1,0 +1,15 @@
+.Task {
+    display: grid;
+    column-count: 1;
+    justify-content: center;
+}
+
+.Task .elements {
+    display: grid;
+    column-count: 1;
+    justify-content: center;
+}
+
+.Task .complete {
+    text-decoration: line-through;
+}

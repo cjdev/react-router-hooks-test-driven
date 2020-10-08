@@ -4,3 +4,9 @@
     display: grid;
     justify-content: center;
 }
+
+h2 {
+    font-size: 1.5em;
+    display: block;
+    font-weight: bold;
+}

@@ -4,3 +4,10 @@
     justify-content: center;
     grid-gap: 2px;
 }
+
+.Profile .elements {
+    display: grid;
+    justify-content: left;
+    grid-gap: 2px;
+    grid-template-columns: auto auto;
+}

@@ -1,35 +1,20 @@
-import React from 'react';
+import React, {Fragment} from 'react';
+import * as R from 'ramda'
 
 const ProfileList = ({profiles, deleteProfile}) => {
     const createProfileListItem = ({name, id}) => {
         const onClickDeleteButton = () => {
             deleteProfile(id)
         }
-        return <li key={id}>
+        return <Fragment key={id}>
             <label htmlFor={id}>
                 <a href={'task/' + id}>{name}</a>
             </label>
             <button onClick={onClickDeleteButton} id={id}>delete</button>
-        </li>
+        </Fragment>
     }
-    const profileListItems = profiles.map(createProfileListItem)
-    return <ul>{profileListItems}</ul>
+    const profileListItems = R.map(createProfileListItem, profiles)
+    return <div className={'elements'}>{profileListItems}</div>
 }
 
 export default ProfileList
-
-/*
-const ProfileList = ({profiles, deleteProfile}) => {
-    const createProfileListItem = ({name, id}) => {
-        const onClickDeleteButton = () => {
-            deleteProfile(id)
-        }
-        return <li key={id}>
-            <label htmlFor={id}>
-                <a href={'task/' + id}>{name}</a>
-            </label>
-            <input type={'button'} onClick={onClickDeleteButton} id={id}>delete</input>
-        </li>
-    }
-
- */
