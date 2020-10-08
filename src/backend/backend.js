@@ -55,13 +55,18 @@ const createBackend = database => {
 
     const getProfile = async id => await database.get({namespace: Namespace.PROFILE, id})
 
+    const updateTask = async task => {
+        return await database.update({namespace: Namespace.TASK, value: task});
+    }
+
     const backend = {
         fetchSummary,
         listProfiles,
         listTasksForProfile,
         deleteProfileAndCorrespondingTasks,
         addProfile,
-        getProfile
+        getProfile,
+        updateTask
     }
 
     return backend

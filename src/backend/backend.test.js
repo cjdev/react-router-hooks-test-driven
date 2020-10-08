@@ -52,16 +52,16 @@ test('fetch summary', async () => {
 
 test('list profiles', async () => {
     // given
-    const profiles = [ {
-        "name" : "home",
-        "id" : "profile-1"
+    const profiles = [{
+        "name": "home",
+        "id": "profile-1"
     }, {
-        "name" : "work",
-        "id" : "profile-2"
+        "name": "work",
+        "id": "profile-2"
     }, {
-        "name" : "vacation",
-        "id" : "profile-3"
-    } ]
+        "name": "vacation",
+        "id": "profile-3"
+    }]
     const listResultMap = {
         [Namespace.PROFILE]: profiles
     }
@@ -175,4 +175,18 @@ test('get profile', async () => {
 
     // then
     expect(actual).toEqual(profile)
+})
+
+test('update task', async () => {
+    // given
+    const value = {id: 'task-id', name: 'task-name'}
+    const update = jest.fn().mockResolvedValueOnce('')
+    const database = {update}
+    const backend = createBackend(database)
+
+    // when
+    await backend.updateTask(value)
+
+    // then
+    expect(update.mock.calls).toEqual([[{namespace: Namespace.TASK, value}]])
 })
