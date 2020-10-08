@@ -19,11 +19,19 @@ const createDatabase = fetchFunction => {
 
     const add = async ({namespace, value}) => await fetchText(namespace, {method: 'POST', body: JSON.stringify(value)})
 
+    const update = async ({namespace, value}) => {
+        const method = 'POST';
+        const body = JSON.stringify(value)
+        const uri = namespace + '/' + value.id;
+        return await fetchText(uri, {method, body})
+    }
+
     const database = {
         list,
         remove,
         add,
-        get
+        get,
+        update
     }
     return database
 }
