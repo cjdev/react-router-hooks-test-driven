@@ -22,7 +22,7 @@ const parseProfileId = pathName => {
     return profileId
 }
 
-const NewTask = ({profileId, loadTasks, backend}) => {
+const NewTask = ({profileId, loadTasks, backend, updateSummary}) => {
     const [newTaskName, setNewTaskName] = useState('');
 
     const submitOnEnter = async event => {
@@ -30,6 +30,7 @@ const NewTask = ({profileId, loadTasks, backend}) => {
         if (event.key !== 'Enter') return;
         const task = {profile: profileId, name: newTaskName, complete: false}
         await backend.addTask(task)
+        await updateSummary()
         setNewTaskName('')
         await loadTasks()
     }
@@ -49,7 +50,8 @@ const NewTask = ({profileId, loadTasks, backend}) => {
 const SingleTask = ({task, updateTask}) => {
     const completeClass = task.complete ? 'complete' : 'in-progress';
     const onClick = () => {
-        updateTask({...task, complete: !task.complete})
+        const newTask = {...task, complete: !task.complete}
+        updateTask(newTask)
     }
     return <span className={completeClass} onClick={onClick}>{task.name}</span>
 }
@@ -67,11 +69,13 @@ const Task = () => {
     const encodedPathName = windowContract.location.pathname
     const pathName = decodeURI(encodedPathName)
     const profileId = parseProfileId(pathName)
+    const updateSummary = async () => {
+        await summaryContext.updateSummary();
+    }
     const loadTasks = async () => {
         const profile = await backend.getProfile(profileId)
         setProfileName(profile.name)
         const tasksFromBackend = await backend.listTasksForProfile(profileId)
-        await summaryContext.updateSummary();
         setTasks(tasksFromBackend)
     }
     const updateTask = async task => {
@@ -84,6 +88,7 @@ const Task = () => {
         const completedTaskIds = R.map(R.prop('id'), completedTasks);
         const promises = R.map(backend.deleteTask, completedTaskIds);
         await Promise.all(promises);
+        await updateSummary()
         return loadTasks();
     }
     useEffect(() => {
@@ -92,7 +97,7 @@ const Task = () => {
     return <div className={'Task'}>
         <h2>{tasks.length} {pluralize({quantity: tasks.length, singular: 'task', plural: 'tasks'})} in
             profile {profileName}</h2>
-        <NewTask profileId={profileId} loadTasks={loadTasks} backend={backend}/>
+        <NewTask profileId={profileId} loadTasks={loadTasks} backend={backend} updateSummary={updateSummary}/>
         <Tasks tasks={tasks} updateTask={updateTask}/>
         <button onClick={onClearClick}>Clear Complete</button>
         <a href={'/profile'}>Profiles</a>

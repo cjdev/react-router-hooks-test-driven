@@ -8,413 +8,295 @@ import {act} from "react-dom/test-utils"
 import * as R from 'ramda'
 import userEvent from '@testing-library/user-event'
 
-const alphabeticCompare = (a, b) => a.localeCompare(b, 'en')
-
-const sortKeys = jsonObject => {
-    const unsortedKeys = R.keys(jsonObject)
-    const sortedKeys = R.sort(alphabeticCompare, unsortedKeys)
-    return R.pick(sortedKeys, jsonObject)
-}
-
-const jsonToKey = jsonObject => JSON.stringify(sortKeys(jsonObject))
-
-const mapWithJsonKeyToJestFunction = (resultMap, name) => {
-    const implementation = keyAsJsonObject => {
-        const key = jsonToKey(keyAsJsonObject)
-        if (R.includes(key, R.keys(resultMap))) {
-            return resultMap[key]
-        } else {
-            const keyDisplay = JSON.stringify(keyAsJsonObject)
-            const resultMapDisplay = JSON.stringify(resultMap)
-            throw `${name}: Key '${keyDisplay}' not found in map ${resultMapDisplay}`
+const createSample = () => {
+    let index = 0
+    const string = prefix => `${prefix}-${++index}`
+    const profile = () => ({
+        name: string('name'),
+        id: string('id')
+    })
+    const task = overrides => {
+        return {
+            profile: overrides?.profile?.id || string('profile-id'),
+            name: overrides.name || string('name'),
+            complete: overrides.complete || false,
+            id: overrides.id || string('id')
         }
     }
-    return jest.fn().mockImplementation(implementation)
+    return {
+        profile,
+        task,
+        string
+    }
 }
 
-const mapToJestFunction = (resultMap, name) => {
-    const implementation = key => {
-        if (R.includes(key, R.keys(resultMap))) {
-            return resultMap[key]
-        } else {
-            throw `${name}: Key '${JSON.stringify(key)}' not found in map ${JSON.stringify(resultMap)}`
-        }
+const createWindowContract = path => ({
+    location: {
+        pathname: path
     }
-    return jest.fn().mockImplementation(implementation)
+})
+
+const createBackend = ({getProfileResult, listTasksResults}) => {
+    const listTasksForProfile = jest.fn()
+    const addListTasksResult = listTasksResult => listTasksForProfile.mockResolvedValueOnce(listTasksResult)
+    R.forEach(addListTasksResult, listTasksResults || [])
+    const getProfile = jest.fn().mockResolvedValue(getProfileResult)
+    const updateTask = jest.fn()
+    const deleteTask = jest.fn()
+    const addTask = jest.fn()
+    const backend = {
+        listTasksForProfile,
+        getProfile,
+        updateTask,
+        deleteTask,
+        addTask
+    }
+    return backend
+}
+
+const createTester = async ({
+                                getProfileResult,
+                                listTasksResults,
+                                path
+                            }) => {
+    const windowContract = createWindowContract(path)
+    const backend = createBackend({getProfileResult, listTasksResults})
+    const updateSummary = jest.fn()
+    let rendered
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Task/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+    })
+    const clickClearCompleteButton = async () => {
+        await act(async () => {
+            fireEvent.click(rendered.getByRole('button', {name: 'Clear Complete'}))
+        })
+    }
+    const clickOnTask = async name => {
+        await act(async () => {
+            fireEvent.click(rendered.getByText(name))
+        })
+    }
+    const typeTaskName = async name => {
+        await act(async () => {
+            const taskNameDataEntry = rendered.getByPlaceholderText('new task')
+            userEvent.type(taskNameDataEntry, name)
+        })
+    }
+    const pressKey = async key => {
+        await act(async () => {
+            const taskNameDataEntry = rendered.getByPlaceholderText('new task')
+            fireEvent.keyUp(taskNameDataEntry, {key})
+        })
+    }
+
+    return {
+        clickClearCompleteButton,
+        clickOnTask,
+        typeTaskName,
+        pressKey,
+        backend,
+        updateSummary,
+        rendered
+    }
 }
 
 test('render singular task', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const task1 = {
-        profile: profileId,
-        "name": "Some Task",
-        "complete": false,
-        "id": "task-1"
-    }
-    const tasks = [task1]
-    const listTasksForProfileMap = {
-        [profileId]: tasks
-    }
-    const listTasksForProfile = mapToJestFunction(listTasksForProfileMap)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap)
-    const backend = {
-        listTasksForProfile,
-        getProfile
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile})
+    const tasks = [task]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults: [tasks],
+        path
     })
-    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
-    expect(rendered.getByText('Some Task')).toBeInTheDocument()
-    expect(rendered.getByText('Some Task').className).toEqual('in-progress')
+
+    // then
+    expect(tester.rendered.getByText(`1 task in profile ${profile.name}`)).toBeInTheDocument()
+    expect(tester.rendered.getByText(task.name)).toBeInTheDocument()
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
 });
 
 test('render plural tasks', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const incompleteTask = {
-        profile: profileId,
-        "name": "Incomplete Task",
-        "complete": false,
-        "id": "task-1"
-    }
-    const completeTask = {
-        profile: profileId,
-        "name": "Complete Task",
-        "complete": true,
-        "id": "task-2"
-    }
-    const tasks = [incompleteTask, completeTask]
-    const listTasksForProfileMap = {
-        [profileId]: tasks
-    }
-    const listTasksForProfile = mapToJestFunction(listTasksForProfileMap)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap)
-    const backend = {
-        listTasksForProfile,
-        getProfile
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task1 = sample.task({profile})
+    const task2 = sample.task({profile})
+    const tasks = [task1, task2]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults: [tasks],
+        path
     })
-    expect(rendered.getByText('2 tasks in profile Profile Name')).toBeInTheDocument()
-    expect(rendered.getByText('Incomplete Task')).toBeInTheDocument()
-    expect(rendered.getByText('Incomplete Task').className).toEqual('in-progress')
-    expect(rendered.getByText('Complete Task')).toBeInTheDocument()
-    expect(rendered.getByText('Complete Task').className).toEqual('complete')
+
+    // then
+    expect(tester.rendered.getByText(`2 tasks in profile ${profile.name}`)).toBeInTheDocument()
+    expect(tester.rendered.getByText(`${task1.name}`)).toBeInTheDocument()
+    expect(tester.rendered.getByText(`${task2.name}`)).toBeInTheDocument()
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
+});
+
+test('incomplete task has class in-progress', async () => {
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile})
+    const tasks = [task]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults: [tasks],
+        path
+    })
+
+    // then
+    expect(tester.rendered.getByText(task.name)).toBeInTheDocument()
+    expect(tester.rendered.getByText(task.name).className).toEqual('in-progress')
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
+});
+
+test('complete task has class complete', async () => {
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile, complete: true})
+    const tasks = [task]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults: [tasks],
+        path
+    })
+
+    // then
+    expect(tester.rendered.getByText(task.name)).toBeInTheDocument()
+    expect(tester.rendered.getByText(task.name).className).toEqual('complete')
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
 });
 
 test('mark task complete', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const originalTask = {
-        profile: profileId,
-        "name": "Some Task",
-        "complete": false,
-        "id": "task-1"
-    }
-    const taskUpdate = R.mergeRight(originalTask, {complete: true})
-    const oldTasks = [originalTask]
-    const newTasks = [taskUpdate]
-    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
-    const updateTaskMap = {
-        [jsonToKey(taskUpdate)]: "task-1"
-    }
-    const updateTask = mapWithJsonKeyToJestFunction(updateTaskMap, 'updateTask')
-    const backend = {
-        listTasksForProfile,
-        getProfile,
-        updateTask
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile})
+    const tasksBefore = [task]
+    const updatedTask = R.mergeRight(task, {complete: true})
+    const tasksAfter = [updatedTask]
+    const listTasksResults = [tasksBefore, tasksAfter]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults,
+        path
     })
-    await act(async () => {
-        fireEvent.click(rendered.getByText('Some Task'))
-    })
-    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
-    expect(rendered.getByText('Some Task')).toBeInTheDocument()
-    expect(rendered.getByText('Some Task').className).toEqual('complete')
-    expect(updateTask.mock.calls).toEqual([
-        [
-            {
-                profile: 'profile-id',
-                name: 'Some Task',
-                complete: true,
-                id: 'task-1'
-            }
-        ]
-    ])
+
+    // when
+    await tester.clickOnTask(task.name)
+
+    // then
+    expect(tester.rendered.getByText(task.name)).toBeInTheDocument()
+    expect(tester.rendered.getByText(task.name).className).toEqual('complete')
+    expect(tester.backend.updateTask.mock.calls).toEqual([[updatedTask]])
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
 });
 
 test('clear complete', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const completeTask = {
-        profile: profileId,
-        "name": "Complete Task",
-        "complete": true,
-        "id": "task-complete-id"
-    }
-    const incompleteTask = {
-        profile: profileId,
-        "name": "Incomplete Task",
-        "complete": false,
-        "id": "task-incomplete-id"
-    }
-    const oldTasks = [completeTask, incompleteTask]
-    const newTasks = [incompleteTask]
-    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
-    const deleteTask = jest.fn()
-    const backend = {
-        listTasksForProfile,
-        getProfile,
-        deleteTask
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
-    })
-    await act(async () => {
-        const clearCompleteButton = rendered.getByText('Clear Complete')
-        userEvent.click(clearCompleteButton)
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const completeTask = sample.task({profile, complete: true})
+    const incompleteTask = sample.task({profile, complete: false})
+    const tasksBefore = [completeTask, incompleteTask]
+    const tasksAfter = [incompleteTask]
+    const listTasksResults = [tasksBefore, tasksAfter]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults,
+        path
     })
 
-    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
-    expect(rendered.getByText('Incomplete Task')).toBeInTheDocument()
-    expect(rendered.getByText('Incomplete Task').className).toEqual('in-progress')
-    expect(deleteTask.mock.calls).toEqual([["task-complete-id"]])
+    // when
+    await tester.clickClearCompleteButton()
+
+    // then
+    expect(tester.rendered.getByText(incompleteTask.name)).toBeInTheDocument()
+    expect(tester.rendered.queryByText(completeTask.name)).not.toBeInTheDocument()
+    expect(tester.backend.deleteTask.mock.calls).toEqual([[completeTask.id]])
+    expect(tester.updateSummary.mock.calls.length).toEqual(1)
 });
 
 test('add task', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const addedTask = {
-        profile: profileId,
-        "name": "Added Task",
-        "complete": false,
-        "id": "task-id"
-    }
-    const oldTasks = []
-    const newTasks = [addedTask]
-    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
-    const addTask = jest.fn()
-    const backend = {
-        listTasksForProfile,
-        getProfile,
-        addTask
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-        userEvent.type(taskNameDataEntry, 'Added Task')
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-        fireEvent.keyUp(taskNameDataEntry, {key: 'Enter'})
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile})
+    const taskToAdd = R.omit(['id'], task)
+    const tasksBefore = []
+    const tasksAfter = [task]
+    const listTasksResults = [tasksBefore, tasksAfter]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults,
+        path
     })
 
-    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
-    expect(rendered.getByText('Added Task')).toBeInTheDocument()
-    expect(addTask.mock.calls).toEqual([[{profile: profileId, name: 'Added Task', complete: false}]])
+    // when
+    await tester.typeTaskName(task.name)
+    await tester.pressKey('Enter')
+
+    // then
+    expect(tester.rendered.getByText(task.name)).toBeInTheDocument()
+    expect(tester.backend.addTask.mock.calls).toEqual([[taskToAdd]])
+    expect(tester.updateSummary.mock.calls.length).toEqual(1)
 });
 
 test('do not add blank task', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const addedTask = {
-        profile: profileId,
-        "name": "Added Task",
-        "complete": false,
-        "id": "task-id"
-    }
-    const oldTasks = []
-    const newTasks = [addedTask]
-    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
-    const addTask = jest.fn()
-    const backend = {
-        listTasksForProfile,
-        getProfile,
-        addTask
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-        fireEvent.keyUp(taskNameDataEntry, {key: 'Enter'})
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const listTasksResults = [[], []]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults,
+        path
     })
 
-    expect(rendered.getByText('0 tasks in profile Profile Name')).toBeInTheDocument()
-    expect(addTask.mock.calls.length).toEqual(0)
+    // when
+    await tester.pressKey('Enter')
+
+    // then
+    expect(tester.backend.addTask.mock.calls).toEqual([])
+    expect(tester.updateSummary.mock.calls.length).toEqual(0)
 });
 
 test('do not add task if key is not enter', async () => {
-    const profileId = 'profile-id'
-    const windowLocationPathnameResult = `/task/${profileId}`
-    const windowContract = {
-        location: {
-            pathname: windowLocationPathnameResult
-        }
-    }
-    const profile = {
-        id: profileId,
-        name: 'Profile Name'
-    }
-    const addedTask = {
-        profile: profileId,
-        "name": "Added Task",
-        "complete": false,
-        "id": "task-id"
-    }
-    const oldTasks = []
-    const newTasks = [addedTask]
-    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
-    const getProfileMap = {
-        [profileId]: profile
-    }
-    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
-    const addTask = jest.fn()
-    const backend = {
-        listTasksForProfile,
-        getProfile,
-        addTask
-    }
-    const updateSummary = jest.fn()
-    let rendered;
-    await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-        userEvent.type(taskNameDataEntry, 'Added Task')
-    })
-    await act(async () => {
-        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
-        fireEvent.keyUp(taskNameDataEntry, {key: 'a'})
+    // given
+    const sample = createSample()
+    const profile = sample.profile()
+    const path = `/task/${profile.id}`
+    const task = sample.task({profile})
+    const listTasksResults = [[], []]
+    const tester = await createTester({
+        getProfileResult: profile,
+        listTasksResults,
+        path
     })
 
-    expect(rendered.getByText('0 tasks in profile Profile Name')).toBeInTheDocument()
-    expect(addTask.mock.calls.length).toEqual(0)
+    // when
+    await tester.typeTaskName(task.name)
+    await tester.pressKey('a')
+
+    // then
+    expect(tester.backend.addTask.mock.calls).toEqual([])
 });
