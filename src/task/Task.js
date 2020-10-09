@@ -28,7 +28,8 @@ const NewTask = ({profileId, loadTasks, backend}) => {
     const submitOnEnter = async event => {
         if (newTaskName === '') return;
         if (event.key !== 'Enter') return;
-        await backend.addTask({profile: profileId, name: newTaskName, complete: false})
+        const task = {profile: profileId, name: newTaskName, complete: false}
+        await backend.addTask(task)
         setNewTaskName('')
         await loadTasks()
     }

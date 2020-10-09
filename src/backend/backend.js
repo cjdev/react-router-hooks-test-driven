@@ -59,6 +59,10 @@ const createBackend = database => {
         return await database.update({namespace: Namespace.TASK, value: task});
     }
 
+    const addTask = async task => {
+        await database.add({namespace: Namespace.TASK, value: task})
+    }
+
     const backend = {
         fetchSummary,
         listProfiles,
@@ -67,7 +71,8 @@ const createBackend = database => {
         addProfile,
         getProfile,
         updateTask,
-        deleteTask
+        deleteTask,
+        addTask
     }
 
     return backend

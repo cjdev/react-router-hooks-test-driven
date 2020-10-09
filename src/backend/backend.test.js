@@ -205,3 +205,17 @@ test('delete task', async () => {
     // then
     expect(remove.mock.calls).toEqual([[{namespace: Namespace.TASK, id}]])
 })
+
+test('add task', async () => {
+    // given
+    const value = {profile: "the-profile-id", name: "the-task-name", complete: false}
+    const add = jest.fn()
+    const database = {add}
+    const backend = createBackend(database)
+
+    // when
+    await backend.addTask(value)
+
+    // then
+    expect(add.mock.calls).toEqual([[{namespace: Namespace.TASK, value}]])
+})
