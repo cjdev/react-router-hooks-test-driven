@@ -22,6 +22,29 @@ const parseProfileId = pathName => {
     return profileId
 }
 
+const NewTask = ({profileId, loadTasks, backend}) => {
+    const [newTaskName, setNewTaskName] = useState('');
+
+    const submitOnEnter = async event => {
+        if (newTaskName === '') return;
+        if (event.key !== 'Enter') return;
+        await backend.addTask({profile: profileId, name: newTaskName, complete: false})
+        setNewTaskName('')
+        await loadTasks()
+    }
+
+    const onNewTaskChange = (event) => {
+        setNewTaskName(event.target.value)
+    }
+
+    return (
+        <input placeholder={"new task"}
+               onKeyUp={submitOnEnter}
+               onChange={onNewTaskChange}
+               value={newTaskName}/>
+    )
+}
+
 const SingleTask = ({task, updateTask}) => {
     const completeClass = task.complete ? 'complete' : 'in-progress';
     const onClick = () => {
@@ -68,6 +91,7 @@ const Task = () => {
     return <div className={'Task'}>
         <h2>{tasks.length} {pluralize({quantity: tasks.length, singular: 'task', plural: 'tasks'})} in
             profile {profileName}</h2>
+        <NewTask profileId={profileId} loadTasks={loadTasks} backend={backend}/>
         <Tasks tasks={tasks} updateTask={updateTask}/>
         <button onClick={onClearClick}>Clear Complete</button>
         <a href={'/profile'}>Profiles</a>

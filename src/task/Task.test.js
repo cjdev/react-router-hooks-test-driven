@@ -259,3 +259,57 @@ test('clear complete', async () => {
     expect(rendered.getByText('Incomplete Task').className).toEqual('in-progress')
     expect(deleteTask.mock.calls).toEqual([["task-complete-id"]])
 });
+
+test('add task', async () => {
+    const profileId = 'profile-id'
+    const windowLocationPathnameResult = `/task/${profileId}`
+    const windowContract = {
+        location: {
+            pathname: windowLocationPathnameResult
+        }
+    }
+    const profile = {
+        id: profileId,
+        name: 'Profile Name'
+    }
+    const addedTask = {
+        profile: profileId,
+        "name": "Added Task",
+        "complete": false,
+        "id": "task-id"
+    }
+    const oldTasks = []
+    const newTasks = [addedTask]
+    const listTasksForProfile = jest.fn().mockResolvedValueOnce(oldTasks).mockResolvedValueOnce(newTasks)
+    const getProfileMap = {
+        [profileId]: profile
+    }
+    const getProfile = mapToJestFunction(getProfileMap, 'getProfile')
+    const addTask = jest.fn()
+    const backend = {
+        listTasksForProfile,
+        getProfile,
+        addTask
+    }
+    const updateSummary = jest.fn()
+    let rendered;
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Task/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+    })
+    await act(async () => {
+        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
+        userEvent.type(taskNameDataEntry, 'Added Task')
+    })
+    await act(async () => {
+        const taskNameDataEntry = rendered.getByPlaceholderText('new task')
+        fireEvent.keyUp(taskNameDataEntry, {key: 'Enter'})
+    })
+
+    expect(rendered.getByText('1 task in profile Profile Name')).toBeInTheDocument()
+    expect(rendered.getByText('Added Task')).toBeInTheDocument()
+    expect(addTask.mock.calls).toEqual([[{profile: profileId, name: 'Added Task', complete: false}]])
+});
