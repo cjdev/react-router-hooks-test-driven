@@ -95,6 +95,86 @@ test('add profile', async () => {
     expect(updateSummary.mock.calls.length).toEqual(updateSummaryCallsBeforeAddingNewProfile + 1)
 });
 
+test('do not add empty profile', async () => {
+    const profilesBefore = [{
+        "name": "home",
+        "id": "profile-1"
+    }]
+    const profilesAfter = [
+        {
+            "name": "home",
+            "id": "profile-1"
+        },
+        {
+            "name": "profile name",
+            "id": "profile-2"
+        }]
+    const listProfiles = jest.fn()
+        .mockResolvedValueOnce(profilesBefore)
+        .mockResolvedValueOnce(profilesAfter)
+    const addProfile = jest.fn()
+    const backend = {listProfiles, addProfile}
+    const updateSummary = jest.fn()
+    let rendered;
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Profile/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+    })
+    const updateSummaryCallsBeforeAddingNewProfile = updateSummary.mock.calls.length
+    await act(async () => {
+        fireEvent.keyUp(rendered.getByPlaceholderText('new profile'), {key: 'Enter', code: 'Enter'})
+        expect(updateSummary.mock.calls.length).toEqual(1)
+    })
+    expect(rendered.getByText('1 profile')).toBeInTheDocument()
+    expect(rendered.getByText('home')).toBeInTheDocument()
+    expect(updateSummary.mock.calls.length).toEqual(updateSummaryCallsBeforeAddingNewProfile)
+    expect(addProfile.mock.calls.length).toEqual(0)
+});
+
+test('do not add profile if key pressed is not enter', async () => {
+    const profilesBefore = [{
+        "name": "home",
+        "id": "profile-1"
+    }]
+    const profilesAfter = [
+        {
+            "name": "home",
+            "id": "profile-1"
+        },
+        {
+            "name": "profile name",
+            "id": "profile-2"
+        }]
+    const listProfiles = jest.fn()
+        .mockResolvedValueOnce(profilesBefore)
+        .mockResolvedValueOnce(profilesAfter)
+    const addProfile = jest.fn()
+    const backend = {listProfiles, addProfile}
+    const updateSummary = jest.fn()
+    let rendered;
+    await act(async () => {
+        rendered = render(<DependencyContext.Provider value={{backend}}>
+            <SummaryContext.Provider value={{updateSummary}}>
+                <Profile/>
+            </SummaryContext.Provider>
+        </DependencyContext.Provider>)
+        userEvent.type(rendered.getByPlaceholderText('new profile'), 'profile name')
+    })
+    const updateSummaryCallsBeforeAddingNewProfile = updateSummary.mock.calls.length
+    await act(async () => {
+        fireEvent.keyUp(rendered.getByPlaceholderText('new profile'), {key: 'a'})
+        expect(updateSummary.mock.calls.length).toEqual(1)
+    })
+    expect(rendered.getByText('1 profile')).toBeInTheDocument()
+    expect(rendered.getByText('home')).toBeInTheDocument()
+    expect(updateSummary.mock.calls.length).toEqual(updateSummaryCallsBeforeAddingNewProfile)
+    expect(addProfile.mock.calls.length).toEqual(0)
+});
+
+
 test('delete profile', async () => {
     const profile1 = {
         "name": "profile-name-1",
