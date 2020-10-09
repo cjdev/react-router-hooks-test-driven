@@ -9,4 +9,3 @@ test('learn spies', () => {
     expect(myFunction()).toBe(undefined);
     expect(myFunction.mock.calls).toEqual([[1], [2, 3], []])
 })
-

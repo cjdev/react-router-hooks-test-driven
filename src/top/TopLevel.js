@@ -1,5 +1,5 @@
 import React from 'react';
-import useDependencies from "./dependency/useDependencies";
+import useDependencies from "../dependency/useDependencies";
 
 const TopLevel = () => {
     const {Routes, Summary} = useDependencies()
