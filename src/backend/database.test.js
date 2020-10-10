@@ -1,108 +1,111 @@
 import '@testing-library/jest-dom/extend-expect'
 import createDatabase from "./database";
 
-test('list', async () => {
-    const namespace = 'the-namespace'
-    const responseText = `[ {
-  "name" : "foo"
-}, {
-  "name" : "bar"
-} ]`
-    const textFunction = jest.fn().mockResolvedValueOnce(responseText)
-    const responseMap = {
-        [`/database/${namespace}`]: {text: textFunction}
+import * as R from 'ramda'
+
+const createFetchFunction = responses => {
+    return async (url, options) => {
+        const responseMatches = response =>
+            R.equals(url, response.url) && R.equals(options, response.options)
+        const responseElement = R.find(responseMatches, responses)
+        if (R.isNil(responseElement)) throw Error(`No response defined for url '${url}' and options ${JSON.stringify(options)}`)
+        const text = async () => responseElement.response
+        return {
+            text
+        }
     }
-    const expected = [{
-        "name": "foo"
-    }, {
-        "name": "bar"
-    }]
-    const fetchFunction = jest.fn().mockImplementation(key => {
-        if (!responseMap[key]) throw `no value defined for key '${key}'`
-        return Promise.resolve(responseMap[key])
-    })
+}
+
+test('list', async () => {
+    // given
+    const namespace = 'the-namespace'
+    const element1 = {name: 'foo'}
+    const element2 = {name: 'bar'}
+    const elements = [element1, element2]
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/database/${namespace}`,
+            response: JSON.stringify(elements)
+        }
+    ])
     const database = createDatabase(fetchFunction)
+
+    // when
     const actual = await database.list(namespace)
-    expect(actual).toEqual(expected)
+
+    // then
+    expect(actual).toEqual(elements)
 })
 
 test('remove', async () => {
     // given
-    const id = 'the-id'
     const namespace = 'the-namespace'
-    const expected = id
-    const textFunction = jest.fn().mockResolvedValueOnce(id)
-    const responseMap = {
-        [`/database/${namespace}/${id}`]: {text: textFunction}
-    }
-    const fetchFunction = jest.fn().mockImplementation(key => {
-        if (!responseMap[key]) throw `no value defined for key '${key}'`
-        return Promise.resolve(responseMap[key])
-    })
+    const id = 'the-id'
+    const response = 'the-response'
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/database/${namespace}/${id}`,
+            options: {
+                method: 'DELETE'
+            },
+            response
+        }
+    ])
     const database = createDatabase(fetchFunction)
 
     // when
     const actual = await database.remove({id, namespace})
 
     // then
-    expect(actual).toEqual(expected)
-    expect(fetchFunction.mock.calls.length).toEqual(1)
-    const callParameters = fetchFunction.mock.calls[0]
-    expect(callParameters).toEqual(['/database/the-namespace/the-id', {method: 'DELETE'}])
+    expect(actual).toEqual(response)
 })
+
 
 test('add', async () => {
     // given
+    const namespace = 'the-namespace'
     const id = 'the-id'
     const value = {
         name: 'the-name'
     }
-    const body = JSON.stringify(value)
-    const namespace = 'the-namespace'
-    const expected = id
-    const textFunction = jest.fn().mockResolvedValueOnce(id)
-    const responseMap = {
-        [`/database/${namespace}`]: {text: textFunction}
-    }
-    const fetchFunction = jest.fn().mockImplementation(key => {
-        if (!responseMap[key]) throw `no value defined for key '${key}'`
-        return Promise.resolve(responseMap[key])
-    })
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/database/${namespace}`,
+            options: {
+                method: 'POST',
+                body: JSON.stringify(value)
+            },
+            response: id
+        }
+    ])
     const database = createDatabase(fetchFunction)
 
     // when
     const actual = await database.add({namespace, value})
 
     // then
-    expect(actual).toEqual(expected)
-    expect(fetchFunction.mock.calls.length).toEqual(1)
-    const callParameters = fetchFunction.mock.calls[0]
-    expect(callParameters).toEqual(['/database/the-namespace', {method: 'POST', body}])
+    expect(actual).toEqual(id)
 })
 
 test('get', async () => {
+    // given
     const id = 'the-id'
     const name = 'the-name'
     const namespace = 'the-namespace'
-    const responseText = `{
-  "id" : "the-id",
-  "name" : "the-name"
-}`
-    const textFunction = jest.fn().mockResolvedValueOnce(responseText)
-    const responseMap = {
-        [`/database/${namespace}/${id}`]: {text: textFunction}
-    }
-    const expected = {
-        id,
-        name
-    }
-    const fetchFunction = jest.fn().mockImplementation(key => {
-        if (!responseMap[key]) throw `no value defined for key '${key}'`
-        return Promise.resolve(responseMap[key])
-    })
+    const response = {id, name}
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/database/${namespace}/${id}`,
+            response: JSON.stringify(response)
+        }
+    ])
     const database = createDatabase(fetchFunction)
+
+    // when
     const actual = await database.get({namespace, id})
-    expect(actual).toEqual(expected)
+
+    // then
+    expect(actual).toEqual(response)
 })
 
 test('update', async () => {
@@ -110,25 +113,22 @@ test('update', async () => {
     const id = 'the-id'
     const name = 'the-name'
     const value = {id, name}
-    const body = JSON.stringify(value)
     const namespace = 'the-namespace'
-    const expected = id
-    const textFunction = jest.fn().mockResolvedValueOnce(id)
-    const responseMap = {
-        [`/database/${namespace}/${id}`]: {text: textFunction}
-    }
-    const fetchFunction = jest.fn().mockImplementation(key => {
-        if (!responseMap[key]) throw `no value defined for key '${key}'`
-        return Promise.resolve(responseMap[key])
-    })
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/database/${namespace}/${id}`,
+            options: {
+                method: 'POST',
+                body: JSON.stringify(value)
+            },
+            response: id
+        }
+    ])
     const database = createDatabase(fetchFunction)
 
     // when
     const actual = await database.update({namespace, value})
 
     // then
-    expect(actual).toEqual(expected)
-    expect(fetchFunction.mock.calls.length).toEqual(1)
-    const callParameters = fetchFunction.mock.calls[0]
-    expect(callParameters).toEqual(['/database/the-namespace/the-id', {method: 'POST', body}])
+    expect(actual).toEqual(id)
 })
