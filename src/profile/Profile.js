@@ -17,13 +17,16 @@ const Profile = () => {
     const {backend} = useDependencies()
     const summaryContext = useSummary()
     const [profiles, setProfiles] = useState([])
+    const updateSummary = async () => {
+        return await summaryContext.updateSummary()
+    }
     const loadProfiles = async () => {
         const latestProfiles = await backend.listProfiles()
-        await summaryContext.updateSummary();
         setProfiles(latestProfiles)
     }
     const deleteProfile = async id => {
         await backend.deleteProfileAndCorrespondingTasks(id)
+        await updateSummary();
         await loadProfiles()
     }
     useEffect(() => {
@@ -32,7 +35,7 @@ const Profile = () => {
     return <div className={'Profile'}>
         <h2>{profiles.length} {pluralize({quantity: profiles.length, singular: 'profile', plural: 'profiles'})}</h2>
         <ProfileList profiles={profiles} deleteProfile={deleteProfile}/>
-        <AddProfile loadProfiles={loadProfiles} backend={backend}/>
+        <AddProfile loadProfiles={loadProfiles} updateSummary={updateSummary}/>
     </div>
 }
 
