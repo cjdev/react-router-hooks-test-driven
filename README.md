@@ -89,5 +89,7 @@ and be more explicit and intentional about what css styles are applied
 ## Reference
 - [React](https://reactjs.org/)
 - [Ramda](https://ramdajs.com/)
-- [jest expect api](https://jestjs.io/docs/en/expect)
-- [testing library queries](https://testing-library.com/docs/dom-testing-library/api-queries)
+- [Jest](https://jestjs.io/)
+    - [expect api](https://jestjs.io/docs/en/expect)
+- [Testing Library](https://testing-library.com)
+    - [queries](https://testing-library.com/docs/dom-testing-library/api-queries)
