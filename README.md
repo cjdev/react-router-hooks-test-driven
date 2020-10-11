@@ -68,7 +68,7 @@ Add the following entry to `package.json`
 ```
 
 - In general, collect test coverage from "src/**/*.{js,jsx,ts,tsx}"
-- Keeping business logic out the root directory, so exclude "!src/*"
+- Since business logic is being kept out the root directory, exclude "!src/*"
 - No need to test third party modules, so exclude "!<rootDir>/node_modules/"
 - Don't need to test utilities that are only used in tests, so exclude "!src/test-util/*" 
 
