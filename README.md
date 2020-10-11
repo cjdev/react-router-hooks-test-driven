@@ -5,7 +5,7 @@
     - [ ] Display all profiles
     - [ ] Add a profile
     - [ ] Remove a profile
-    - [ ] Navigate tasks associated with a particular profile
+    - [ ] Navigate to tasks associated with a particular profile
 - [ ] Tasks
     - [ ] Display all tasks for a particular profile
     - [ ] Add a task
