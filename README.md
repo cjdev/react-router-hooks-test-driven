@@ -21,7 +21,7 @@ Any style that facilitates test driven design equally well is equally valid,
 and any style that is harder to test should be changed in its design until it is at least as easy to test as the well known and well documented test driven styles.
 
 ## Original Readme File (generated)
-[README-generated.md](README-generated.md)
+[README-generated.md](README-originally-generated.md)
 
 ## Before running
 - `npm install`
