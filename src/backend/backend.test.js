@@ -3,15 +3,7 @@ import createBackend from "./backend";
 import Namespace from "../constants/Namespace";
 import * as R from "ramda";
 import createSample from "../test-util/sample";
-
-const createMapFunction = entries => {
-    return async key => {
-        const entryMatches = entry => R.equals(key, entry.key)
-        const entry = R.find(entryMatches, entries)
-        if (R.isNil(entry)) throw Error(`No value defined for key '${key}'`)
-        return entry.value
-    }
-}
+import {createMapFunction} from "../test-util/stub";
 
 test('descriptive error if no database', async () => {
     expect(() => createBackend()).toThrow('backend missing dependency database')

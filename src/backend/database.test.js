@@ -1,20 +1,6 @@
 import '@testing-library/jest-dom/extend-expect'
 import createDatabase from "./database";
-
-import * as R from 'ramda'
-
-const createFetchFunction = responses => {
-    return async (url, options) => {
-        const responseMatches = response =>
-            R.equals(url, response.url) && R.equals(options, response.options)
-        const responseElement = R.find(responseMatches, responses)
-        if (R.isNil(responseElement)) throw Error(`No response defined for url '${url}' and options ${JSON.stringify(options)}`)
-        const text = async () => responseElement.response
-        return {
-            text
-        }
-    }
-}
+import {createFetchFunction} from "../test-util/stub";
 
 test('list', async () => {
     // given
