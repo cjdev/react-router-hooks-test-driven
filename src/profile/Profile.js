@@ -1,16 +1,42 @@
 import './Profile.css'
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import useDependencies from "../dependency/useDependencies";
 import useSummary from "../summary/useSummary";
-import ProfileList from "./ProfileList";
-import AddProfile from "./AddProfile";
+import * as R from "ramda";
+import {pluralize} from "../string-util/string-util";
 
-const pluralize = ({quantity, singular, plural}) => {
-    if (quantity === 1) {
-        return singular
-    } else {
-        return plural
+const ProfileList = ({profiles, deleteProfile}) => {
+    const createProfileListItem = ({name, id}) => {
+        const onClickDeleteButton = () => {
+            deleteProfile(id)
+        }
+        return <Fragment key={id}>
+            <label htmlFor={id}>
+                <a href={'task/' + id}>{name}</a>
+            </label>
+            <button onClick={onClickDeleteButton} id={id}>delete</button>
+        </Fragment>
     }
+    const profileListItems = R.map(createProfileListItem, profiles)
+    return <div className={'elements'}>{profileListItems}</div>
+}
+
+const AddProfile = ({loadProfiles, updateSummary}) => {
+    const {backend} = useDependencies()
+    const [newProfileName, setNewProfileName] = useState("")
+    const newProfileOnChange = event => setNewProfileName(event.target.value)
+    const newProfileOnKeyUp = async event => {
+        if (newProfileName === '') return;
+        if (event.key !== 'Enter') return;
+        await backend.addProfile(newProfileName);
+        await updateSummary();
+        setNewProfileName('');
+        loadProfiles()
+    }
+    return <input value={newProfileName}
+                  placeholder={'new profile'}
+                  onKeyUp={newProfileOnKeyUp}
+                  onChange={newProfileOnChange}/>
 }
 
 const Profile = () => {

@@ -3,16 +3,7 @@ import React, {useEffect, useState} from "react";
 import useSummary from "../summary/useSummary";
 import useDependencies from "../dependency/useDependencies";
 import * as R from 'ramda'
-
-const pluralize = ({quantity, singular, plural}) => {
-    if (quantity === 1) {
-        return singular
-    } else {
-        return plural
-    }
-}
-
-export {pluralize};
+import {pluralize} from "../string-util/string-util";
 
 const profileIdFromPathNameRegex = /\/task\/(.*)/
 
