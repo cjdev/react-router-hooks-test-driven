@@ -1,5 +1,25 @@
 # React Router Hooks (test driven)
 
+## Intent
+You should know how write a front end application that handles all of the following in a testable way
+- presentation
+- state
+- side effects
+- multiple pages
+- back button
+- an event in one component triggering a state change in another, without coupling those components together
+
+This is a fully test driven example project that shows one way of accomplishing this.
+
+## Style
+This example places state management in the individual components that use that state.
+To avoid property drilling and facilitate testing, dependencies are provided via a context hook.
+
+Another style could be to decouple state management into a global state object managed by useReducer hooks,
+where individual components do nothing more than render props and fire events.
+Any style that facilitates test driven design equally well is equally valid,
+and any style that is harder to test should be changed in its design until it is at least as easy to test as the well known and well documented test driven styles.
+
 ## Original Readme File (generated)
 [README-generated.md](README-generated.md)
 
