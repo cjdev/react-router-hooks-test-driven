@@ -2,7 +2,7 @@ import Namespace from "../constants/Namespace";
 import * as R from 'ramda'
 
 const createBackend = database => {
-    if (!database) throw 'backend missing dependency database'
+    if (!database) throw Error('backend missing dependency database')
     const deleteTask = async id => {
         const result = await database.remove({namespace: Namespace.TASK, id});
         return result

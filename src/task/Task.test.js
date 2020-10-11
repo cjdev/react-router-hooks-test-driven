@@ -7,28 +7,7 @@ import SummaryContext from "../summary/SummaryContext";
 import {act} from "react-dom/test-utils"
 import * as R from 'ramda'
 import userEvent from '@testing-library/user-event'
-
-const createSample = () => {
-    let index = 0
-    const string = prefix => `${prefix}-${++index}`
-    const profile = () => ({
-        name: string('name'),
-        id: string('id')
-    })
-    const task = overrides => {
-        return {
-            profile: overrides?.profile?.id || string('profile-id'),
-            name: overrides.name || string('name'),
-            complete: overrides.complete || false,
-            id: overrides.id || string('id')
-        }
-    }
-    return {
-        profile,
-        task,
-        string
-    }
-}
+import createSample from "../test-util/sample";
 
 const createWindowContract = path => ({
     location: {
