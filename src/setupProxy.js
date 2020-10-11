@@ -5,12 +5,12 @@ module.exports = function (app) {
         target: 'http://localhost:8080',
         changeOrigin: true,
         pathRewrite: {
-            '^/database/task': '/task',
-            '^/database/profile': '/profile'
+            '^/proxy/task': '/task',
+            '^/proxy/profile': '/profile'
         }
     };
     app.use(
-        '/database',
+        '/proxy',
         createProxyMiddleware(options)
     );
 };

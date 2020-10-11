@@ -1,6 +1,6 @@
 const createDatabase = fetchFunction => {
     const fetchText = async (relativeResource, init) => {
-        const resource = '/database/' + relativeResource
+        const resource = '/proxy/' + relativeResource
         const response = await fetchFunction(resource, init)
         const text = await response.text()
         return text

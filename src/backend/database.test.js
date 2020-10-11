@@ -10,7 +10,7 @@ test('list', async () => {
     const elements = [element1, element2]
     const fetchFunction = createFetchFunction([
         {
-            url: `/database/${namespace}`,
+            url: `/proxy/${namespace}`,
             response: JSON.stringify(elements)
         }
     ])
@@ -30,7 +30,7 @@ test('remove', async () => {
     const response = 'the-response'
     const fetchFunction = createFetchFunction([
         {
-            url: `/database/${namespace}/${id}`,
+            url: `/proxy/${namespace}/${id}`,
             options: {
                 method: 'DELETE'
             },
@@ -56,7 +56,7 @@ test('add', async () => {
     }
     const fetchFunction = createFetchFunction([
         {
-            url: `/database/${namespace}`,
+            url: `/proxy/${namespace}`,
             options: {
                 method: 'POST',
                 body: JSON.stringify(value)
@@ -81,7 +81,7 @@ test('get', async () => {
     const response = {id, name}
     const fetchFunction = createFetchFunction([
         {
-            url: `/database/${namespace}/${id}`,
+            url: `/proxy/${namespace}/${id}`,
             response: JSON.stringify(response)
         }
     ])
@@ -102,7 +102,7 @@ test('update', async () => {
     const namespace = 'the-namespace'
     const fetchFunction = createFetchFunction([
         {
-            url: `/database/${namespace}/${id}`,
+            url: `/proxy/${namespace}/${id}`,
             options: {
                 method: 'POST',
                 body: JSON.stringify(value)
