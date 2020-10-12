@@ -11,7 +11,7 @@ const createDatabase = fetchFunction => {
             const json = JSON.parse(text);
             return json;
         } catch (e) {
-            throw Error(`expected json from ${JSON.stringify({resource, init})}, but got '${text}'`)
+            throw Error(`fetch ${JSON.stringify({resource, init})}, expected json, but got '${text}'`)
         }
     }
 

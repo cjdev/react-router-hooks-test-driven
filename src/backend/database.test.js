@@ -118,3 +118,19 @@ test('update', async () => {
     // then
     expect(actual).toEqual(id)
 })
+
+test('handle malformed json', async () => {
+    // given
+    const namespace = 'the-namespace'
+    const response = '<div>this is not json</div>'
+    const fetchFunction = createFetchFunction([
+        {
+            url: `/proxy/${namespace}`,
+            response
+        }
+    ])
+    const database = createDatabase(fetchFunction)
+
+    // then
+    await expect(database.list(namespace)).rejects.toThrow(`fetch {"resource":"${namespace}"}, expected json, but got '${response}'`)
+})

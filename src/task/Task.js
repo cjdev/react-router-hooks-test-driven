@@ -4,6 +4,7 @@ import useSummary from "../summary/useSummary";
 import useDependencies from "../dependency/useDependencies";
 import * as R from 'ramda'
 import {pluralize} from "../string-util/string-util";
+import {ErrorComponent, handleAsyncError} from "../error/ErrorComponent";
 
 const profileIdFromPathNameRegex = /\/task\/(.*)/
 
@@ -13,10 +14,10 @@ const parseProfileId = pathName => {
     return profileId
 }
 
-const NewTask = ({profileId, loadTasks, backend, updateSummary}) => {
+const NewTask = ({profileId, loadTasks, backend, updateSummary, setError}) => {
     const [newTaskName, setNewTaskName] = useState('');
 
-    const submitOnEnter = async event => {
+    const submitOnEnter = handleAsyncError(setError)(async event => {
         if (newTaskName === '') return;
         if (event.key !== 'Enter') return;
         const task = {profile: profileId, name: newTaskName, complete: false}
@@ -24,7 +25,7 @@ const NewTask = ({profileId, loadTasks, backend, updateSummary}) => {
         await updateSummary()
         setNewTaskName('')
         await loadTasks()
-    }
+    })
 
     const onNewTaskChange = (event) => {
         setNewTaskName(event.target.value)
@@ -56,24 +57,25 @@ const Task = () => {
     const {backend, windowContract} = useDependencies()
     const summaryContext = useSummary();
     const [tasks, setTasks] = useState([]);
+    const [error, setError] = useState();
     const [profileName, setProfileName] = useState('');
     const encodedPathName = windowContract.location.pathname
     const pathName = decodeURI(encodedPathName)
     const profileId = parseProfileId(pathName)
-    const updateSummary = async () => {
+    const updateSummary = handleAsyncError(setError)(async () => {
         await summaryContext.updateSummary();
-    }
-    const loadTasks = async () => {
+    })
+    const loadTasks = handleAsyncError(setError)(async () => {
         const profile = await backend.getProfile(profileId)
         setProfileName(profile.name)
         const tasksFromBackend = await backend.listTasksForProfile(profileId)
         setTasks(tasksFromBackend)
-    }
-    const updateTask = async task => {
+    })
+    const updateTask = handleAsyncError(setError)(async task => {
         await backend.updateTask(task)
         loadTasks()
-    }
-    const onClearClick = async () => {
+    })
+    const onClearClick = handleAsyncError(setError)(async () => {
         const isComplete = task => task.complete;
         const completedTasks = R.filter(isComplete, tasks);
         const completedTaskIds = R.map(R.prop('id'), completedTasks);
@@ -81,14 +83,16 @@ const Task = () => {
         await Promise.all(promises);
         await updateSummary()
         return loadTasks();
-    }
+    })
     useEffect(() => {
         loadTasks()
     }, []);
     return <div className={'Task'}>
         <h2>{tasks.length} {pluralize({quantity: tasks.length, singular: 'task', plural: 'tasks'})} in
             profile {profileName}</h2>
-        <NewTask profileId={profileId} loadTasks={loadTasks} backend={backend} updateSummary={updateSummary}/>
+        <ErrorComponent error={error}/>
+        <NewTask profileId={profileId} loadTasks={loadTasks} backend={backend} updateSummary={updateSummary}
+                 setError={setError}/>
         <Tasks tasks={tasks} updateTask={updateTask}/>
         <button onClick={onClearClick}>Clear Complete</button>
         <a href={'/profile'}>Profiles</a>
