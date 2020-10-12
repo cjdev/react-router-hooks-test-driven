@@ -4,7 +4,7 @@ import './ErrorComponent.css'
 
 const handleAsyncError = setError => f => async (...args) => {
     try {
-        await f(...args)
+        return await f(...args)
     } catch (e) {
         setError(e)
     }
@@ -12,7 +12,7 @@ const handleAsyncError = setError => f => async (...args) => {
 
 const ErrorComponent = ({error}) => {
     if (R.isNil(error)) {
-        return <div/>
+        return null
     } else {
         return <div className={'error'}>{error.message}</div>
     }
