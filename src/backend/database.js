@@ -7,8 +7,12 @@ const createDatabase = fetchFunction => {
     }
     const fetchJson = async (resource, init) => {
         const text = await fetchText(resource, init);
-        const json = JSON.parse(text);
-        return json;
+        try {
+            const json = JSON.parse(text);
+            return json;
+        } catch (e) {
+            throw Error(`expected json from ${JSON.stringify({resource, init})}, but got '${text}'`)
+        }
     }
 
     const list = async namespace => await fetchJson(namespace)
