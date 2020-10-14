@@ -128,7 +128,7 @@ and import it from index.js `import './reset.css'`
 The idea here is to preserve a consistent presentation in spite of different browser css defaults,
 and be more explicit and intentional about what css styles are applied
 
-## Reference
+## Technology Stack
 - [React](https://reactjs.org/)
 - [Ramda](https://ramdajs.com/)
 - [React Router](https://reactrouter.com/)
