@@ -37,10 +37,13 @@ This is a fully test driven example project that shows one way of accomplishing 
 This example places state management in the individual components that use that state.
 To avoid property drilling and facilitate testing, dependencies are provided via a context hook.
 
-Another style could be to decouple state management into a global state object managed by useReducer hooks,
-where individual components do nothing more than render props and fire events.
+## Alternative Styles
+- It would be equally valid to use the useReducer() hook rather than the useState() hook
+- It is also possible to put all state in a single global object, managed by a hierarchy of reducers.
+  This has the advantage of making individual components so simple that all they do is render properties and fire events.
+
 Any style that facilitates test driven design equally well is equally valid,
-and any style that is harder to test should be changed in its design until it is at least as easy to test as the well known and well documented test driven styles.
+and any style that is harder to test should be changed in its design until it is at least as easy to test as the well-known and well-documented test driven styles.
 
 ## Original Readme File (generated)
 [README-generated.md](README-originally-generated.md)
