@@ -38,7 +38,7 @@ This example places state management in the individual components that use that 
 To avoid property drilling and facilitate testing, dependencies are provided via a context hook.
 
 ## Alternative Styles
-- You can use property drilling instead of a context
+- You can use property drilling (dependency injection) instead of a context (service locator)
 - You can use the useReducer() hook rather than the useState() hook
 - It is possible to put all state in a single global object, managed by a hierarchy of reducers.
   This has the advantage of making individual components so simple that all they do is render properties and fire events.
