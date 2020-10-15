@@ -38,8 +38,9 @@ This example places state management in the individual components that use that 
 To avoid property drilling and facilitate testing, dependencies are provided via a context hook.
 
 ## Alternative Styles
-- It would be equally valid to use the useReducer() hook rather than the useState() hook
-- It is also possible to put all state in a single global object, managed by a hierarchy of reducers.
+- You can use property drilling instead of a context
+- You can use the useReducer() hook rather than the useState() hook
+- It is possible to put all state in a single global object, managed by a hierarchy of reducers.
   This has the advantage of making individual components so simple that all they do is render properties and fire events.
 
 Any style that facilitates test driven design equally well is equally valid,
@@ -55,6 +56,8 @@ and any style that is harder to test should be changed in its design until it is
 ## Scripts
 - `./sample-data.sh`
     - create sample data for the application
+- `./prepare.sh`
+    - fetch dependencies for the application
 - `./run.sh`
     - run the application
 - `./test.sh`
