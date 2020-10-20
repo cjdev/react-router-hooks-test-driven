@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
-import ProductionDependencyProvider from "./ProductionDependencyProvider";
+import Dependencies from "./Dependencies";
 import TopLevel from "./top/TopLevel";
 
 const App = () =>
     <div>
-        <ProductionDependencyProvider>
+        <Dependencies>
             <TopLevel/>
-        </ProductionDependencyProvider>
+        </Dependencies>
     </div>
 
 export default App;

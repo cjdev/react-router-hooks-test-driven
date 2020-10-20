@@ -9,7 +9,7 @@ import {createBrowserHistory} from 'history';
 import Task from "./task/Task";
 import Profile from "./profile/Profile";
 
-const ProductionDependencyProvider = ({children}) => {
+const Dependencies = ({children}) => {
     const fetchContract = fetch
     const database = createDatabase(fetchContract)
     const backend = createBackend(database)
@@ -26,4 +26,4 @@ const ProductionDependencyProvider = ({children}) => {
     )
 }
 
-export default ProductionDependencyProvider;
+export default Dependencies;
