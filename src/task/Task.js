@@ -1,7 +1,6 @@
 import './Task.css'
 import React, {useEffect, useState} from "react";
 import useSummary from "../summary/useSummary";
-import useDependencies from "../dependency/useDependencies";
 import * as R from 'ramda'
 import {pluralize} from "../string-util/string-util";
 import {ErrorComponent, handleAsyncError} from "../error/ErrorComponent";
@@ -53,8 +52,7 @@ const Tasks = ({tasks, updateTask}) => {
     return <div className={'elements'}>{taskElements}</div>
 }
 
-const Task = () => {
-    const {backend, windowContract} = useDependencies()
+const Task = ({backend, windowContract}) => {
     const summaryContext = useSummary();
     const [tasks, setTasks] = useState([]);
     const [error, setError] = useState();

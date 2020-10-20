@@ -2,7 +2,6 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import Task from "./Task";
-import DependencyContext from "../dependency/DependencyContext";
 import SummaryContext from "../summary/SummaryContext";
 import {act} from "react-dom/test-utils"
 import * as R from 'ramda'
@@ -43,11 +42,10 @@ const createTester = async ({
     const updateSummary = jest.fn()
     let rendered
     await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend, windowContract}}>
+        rendered = render(
             <SummaryContext.Provider value={{updateSummary}}>
-                <Task/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
+                <Task backend={backend} windowContract={windowContract}/>
+            </SummaryContext.Provider>)
     })
     const clickClearCompleteButton = async () => {
         await act(async () => {

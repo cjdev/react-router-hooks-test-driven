@@ -1,9 +1,7 @@
 import React from 'react';
-import useDependencies from "../dependency/useDependencies";
 import {Redirect, Route, Router, Switch} from "react-router-dom";
 
-const Routes = () => {
-    const {history, Profile, Task} = useDependencies()
+const Routes = ({history, Profile, Task}) => {
     return <Router history={history}>
         <Switch>
             <Route path="/profile">

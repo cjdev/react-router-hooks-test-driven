@@ -1,7 +1,6 @@
 import React from 'react';
 import {createMemoryHistory} from 'history'
 import {render} from '@testing-library/react'
-import DependencyContext from "../dependency/DependencyContext";
 import Routes from '../navigation/Routes'
 import '@testing-library/jest-dom/extend-expect'
 
@@ -12,9 +11,7 @@ const testRoute = ({path, expected}) => {
     const history = createMemoryHistory()
     history.push(path)
     const rendered = render(
-        <DependencyContext.Provider value={{history, Task, Profile}}>
-            <Routes/>
-        </DependencyContext.Provider>
+        <Routes history={history} Task={Task} Profile={Profile}/>
     )
     expect(rendered.getByText(expected)).toBeInTheDocument()
 }

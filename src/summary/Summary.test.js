@@ -1,7 +1,6 @@
 import React from 'react';
 import {fireEvent, render} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import DependencyContext from "../dependency/DependencyContext";
 import SummaryProvider from "./SummaryProvider";
 import Summary from "./Summary";
 
@@ -19,11 +18,9 @@ test('render summary', async () => {
     let rendered
     await act(async () => {
         rendered = render(
-            <DependencyContext.Provider value={{backend}}>
-                <SummaryProvider>
-                    <Summary/>
-                </SummaryProvider>
-            </DependencyContext.Provider>
+            <SummaryProvider backend={backend}>
+                <Summary/>
+            </SummaryProvider>
         )
     })
     expect(rendered.getByText('Number of profiles = 123')).toBeInTheDocument()
@@ -49,12 +46,10 @@ test('update summary', async () => {
     let rendered
     await act(async () => {
         rendered = render(
-            <DependencyContext.Provider value={{backend}}>
-                <SummaryProvider>
-                    <Summary/>
-                    <ComponentThatTriggersUpdate/>
-                </SummaryProvider>
-            </DependencyContext.Provider>
+            <SummaryProvider backend={backend}>
+                <Summary/>
+                <ComponentThatTriggersUpdate/>
+            </SummaryProvider>
         )
     })
     await act(async () => {

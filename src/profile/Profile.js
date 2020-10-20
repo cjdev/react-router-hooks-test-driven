@@ -1,6 +1,5 @@
 import './Profile.css'
 import React, {Fragment, useEffect, useState} from "react";
-import useDependencies from "../dependency/useDependencies";
 import useSummary from "../summary/useSummary";
 import * as R from "ramda";
 import {pluralize} from "../string-util/string-util";
@@ -22,8 +21,7 @@ const ProfileList = ({profiles, deleteProfile}) => {
     return <div className={'elements'}>{profileListItems}</div>
 }
 
-const AddProfile = ({loadProfiles, updateSummary, setError}) => {
-    const {backend} = useDependencies()
+const AddProfile = ({backend, loadProfiles, updateSummary, setError}) => {
     const [newProfileName, setNewProfileName] = useState("")
     const newProfileOnChange = event => setNewProfileName(event.target.value)
     const newProfileOnKeyUp = handleAsyncError(setError)(async event => {
@@ -40,8 +38,7 @@ const AddProfile = ({loadProfiles, updateSummary, setError}) => {
                   onChange={newProfileOnChange}/>
 }
 
-const Profile = () => {
-    const {backend} = useDependencies()
+const Profile = ({backend}) => {
     const summaryContext = useSummary()
     const [profiles, setProfiles] = useState([])
     const [error, setError] = useState()
@@ -64,7 +61,7 @@ const Profile = () => {
         <h2>{profiles.length} {pluralize({quantity: profiles.length, singular: 'profile', plural: 'profiles'})}</h2>
         <ErrorComponent error={error}/>
         <ProfileList profiles={profiles} deleteProfile={deleteProfile}/>
-        <AddProfile loadProfiles={loadProfiles} updateSummary={updateSummary} setError={setError}/>
+        <AddProfile backend={backend} loadProfiles={loadProfiles} updateSummary={updateSummary} setError={setError}/>
     </div>
 }
 

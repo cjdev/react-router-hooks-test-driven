@@ -1,13 +1,11 @@
 import React from 'react';
 import './App.css';
-import Dependencies from "./Dependencies";
-import TopLevel from "./top/TopLevel";
+import {TopLevelNoArg, SummaryProviderNoArg} from "./Dependencies"
 
-const App = () =>
-    <div>
-        <Dependencies>
-            <TopLevel/>
-        </Dependencies>
+const App = () => <div>
+        <SummaryProviderNoArg>
+            <TopLevelNoArg/>
+        </SummaryProviderNoArg>
     </div>
 
 export default App;

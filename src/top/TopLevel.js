@@ -1,8 +1,6 @@
 import React from 'react';
-import useDependencies from "../dependency/useDependencies";
 
-const TopLevel = () => {
-    const {Routes, Summary} = useDependencies()
+const TopLevel = ({Routes, Summary}) => {
     return <div>
         <Routes/>
         <Summary/>

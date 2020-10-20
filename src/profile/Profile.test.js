@@ -2,7 +2,6 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import Profile from "./Profile";
-import DependencyContext from "../dependency/DependencyContext";
 import SummaryContext from "../summary/SummaryContext";
 import {act} from "react-dom/test-utils"
 import userEvent from '@testing-library/user-event'
@@ -30,11 +29,9 @@ const createTester = async ({
     const updateSummary = jest.fn()
     let rendered
     await act(async () => {
-        rendered = render(<DependencyContext.Provider value={{backend}}>
-            <SummaryContext.Provider value={{updateSummary}}>
-                <Profile/>
-            </SummaryContext.Provider>
-        </DependencyContext.Provider>)
+        rendered = render(<SummaryContext.Provider value={{updateSummary}}>
+                <Profile backend={backend}/>
+            </SummaryContext.Provider>)
     })
     const clickDeleteButton = async profileId => {
         await act(async () => {
