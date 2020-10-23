@@ -34,11 +34,13 @@ You should know how write a front end application that handles all of the follow
 This is a fully test driven example project that shows one way of accomplishing this.
 
 ## Style
-This example places state management in the individual components that use that state.
-To avoid property drilling and facilitate testing, dependencies are provided via a context hook.
+- Local state rather than centralized state
+- useState() hook rather than useReducer() hook
+- Uses [no-arg constructors](https://gitlab.cj.dev/training/react-router-hooks-test-driven/tree/no-arg-constructor) rather than a context hook as a service locator pattern or dependency injection with property drilling
+- Vanilla javascript with jsx extension rather than Typescript, Purescript, or Kotlin
 
 ## Alternative Styles
-- Choose between creating [no-arg constructors](https://gitlab.cj.dev/training/react-router-hooks-test-driven/tree/no-arg-constructor), or [using a context as a service locator](https://gitlab.cj.dev/training/react-router-hooks-test-driven/tree/context-service-locator) 
+- See the branch for how to [use a context as a service locator](https://gitlab.cj.dev/training/react-router-hooks-test-driven/tree/context-service-locator) 
 - You can use the useReducer() hook rather than the useState() hook
 - It is possible to put all state in a single global object, managed by a hierarchy of reducers.
   This has the advantage of making individual components so simple that all they do is render properties and fire events.
