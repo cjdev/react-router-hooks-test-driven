@@ -17,7 +17,7 @@ const windowContract = window
 const TaskNoArg = () => <Task backend={backend} windowContract={windowContract}/>
 const ProfileNoArg = () => <Profile backend={backend}/>
 const RoutesNoArg = () => <Routes history={history} Profile={ProfileNoArg} Task={TaskNoArg}/>
-const TopLevelNoArg = () => <TopLevel Routes={RoutesNoArg} Summary={Summary}/>
 const SummaryProviderNoArg = ({children}) => <SummaryProvider backend={backend}>{children}</SummaryProvider>
+const TopLevelNoArg = () => <TopLevel Routes={RoutesNoArg} Summary={Summary} SummaryProvider={SummaryProviderNoArg}/>
 
-export {TopLevelNoArg, SummaryProviderNoArg}
+export {TopLevelNoArg}

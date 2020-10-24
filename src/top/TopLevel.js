@@ -1,10 +1,9 @@
 import React from 'react';
 
-const TopLevel = ({Routes, Summary}) => {
-    return <div>
+const TopLevel = ({Routes, Summary, SummaryProvider}) =>
+    <SummaryProvider>
         <Routes/>
         <Summary/>
-    </div>
-}
+    </SummaryProvider>
 
 export default TopLevel;
