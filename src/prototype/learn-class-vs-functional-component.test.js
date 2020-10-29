@@ -27,7 +27,6 @@ test('functional component with children', () => {
         <div>child 1</div>
         <div>child 2</div>
     </FunctionalComponentWithChildren>)
-    renderResult.debug()
     expect(renderResult.getByText('hello world')).toBeInTheDocument()
     expect(renderResult.getByText('child 1')).toBeInTheDocument()
     expect(renderResult.getByText('child 2')).toBeInTheDocument()
