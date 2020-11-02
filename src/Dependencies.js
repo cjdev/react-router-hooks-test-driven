@@ -14,10 +14,11 @@ const database = createDatabase(fetchContract)
 const backend = createBackend(database)
 const history = createBrowserHistory()
 const windowContract = window
-const TaskNoArg = () => <Task backend={backend} windowContract={windowContract}/>
-const ProfileNoArg = () => <Profile backend={backend}/>
-const RoutesNoArg = () => <Routes history={history} Profile={ProfileNoArg} Task={TaskNoArg}/>
-const SummaryProviderNoArg = ({children}) => <SummaryProvider backend={backend}>{children}</SummaryProvider>
-const TopLevelNoArg = () => <TopLevel Routes={RoutesNoArg} Summary={Summary} SummaryProvider={SummaryProviderNoArg}/>
+const DefaultTask = () => <Task backend={backend} windowContract={windowContract}/>
+const DefaultProfile = () => <Profile backend={backend}/>
+const DefaultRoutes = () => <Routes history={history} Profile={DefaultProfile} Task={DefaultTask}/>
+const DefaultSummaryProvider = ({children}) => <SummaryProvider backend={backend}>{children}</SummaryProvider>
+const DefaultTopLevel = () => <TopLevel Routes={DefaultRoutes} Summary={Summary}
+                                        SummaryProvider={DefaultSummaryProvider}/>
 
-export {TopLevelNoArg}
+export default DefaultTopLevel

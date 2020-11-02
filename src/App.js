@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import {TopLevelNoArg} from "./Dependencies"
+import DefaultTopLevel from "./Dependencies"
 
-const App = () => <TopLevelNoArg/>
+const App = () => <DefaultTopLevel/>
 
 export default App;
