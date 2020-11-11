@@ -113,12 +113,11 @@ module.exports = function (app) {
         target: 'http://localhost:8080',
         changeOrigin: true,
         pathRewrite: {
-            '^/proxy/task': '/task',
-            '^/proxy/profile': '/profile'
+            '^/proxy/': '/',
         }
     };
     app.use(
-        '/proxy',
+        '/proxy/',
         createProxyMiddleware(options)
     );
 };
