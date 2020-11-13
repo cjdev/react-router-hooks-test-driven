@@ -71,7 +71,7 @@ const Task = ({backend, windowContract}) => {
     })
     const updateTask = handleAsyncError(setError)(async task => {
         await backend.updateTask(task)
-        loadTasks()
+        await loadTasks()
     })
     const onClearClick = handleAsyncError(setError)(async () => {
         const isComplete = task => task.complete;
@@ -80,7 +80,7 @@ const Task = ({backend, windowContract}) => {
         const promises = R.map(backend.deleteTask, completedTaskIds);
         await Promise.all(promises);
         await updateSummary()
-        return loadTasks();
+        return await loadTasks();
     })
     useEffect(() => {
         loadTasks()
