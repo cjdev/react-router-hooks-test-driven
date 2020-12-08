@@ -136,6 +136,9 @@ and import it from index.js `import './reset.css'`
 The idea here is to preserve a consistent presentation in spite of different browser css defaults,
 and be more explicit and intentional about what css styles are applied
 
+## Infinite Recursion on useEffect explained
+[How to Fix the Infinite Loop Inside “useEffect” (React Hooks)](https://medium.com/@andrewmyint/infinite-loop-inside-useeffect-react-hooks-6748de62871)
+
 ## Technology Stack
 - [React](https://reactjs.org/)
 - [Ramda](https://ramdajs.com/)
