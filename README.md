@@ -76,6 +76,7 @@ cd react-router-hooks-test-driven
 npm install ramda --save
 npm install react-router-dom --save
 npm install http-proxy-middleware --save
+npm install history@^4 --save
 ```
 
 ### Test coverage setup
@@ -140,6 +141,7 @@ and be more explicit and intentional about what css styles are applied
 - [Ramda](https://ramdajs.com/)
 - [React Router](https://reactrouter.com/)
     - [react-router-dom](https://www.npmjs.com/package/react-router-dom)
+- [history](https://github.com/ReactTraining/history/)
 - [Jest](https://jestjs.io/)
     - [expect api](https://jestjs.io/docs/en/expect)
 - [Testing Library](https://testing-library.com)
