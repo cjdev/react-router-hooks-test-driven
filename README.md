@@ -1,5 +1,12 @@
 # React Router Hooks (test driven)
 
+## For the onboarding exercise, make sure
+- [ ] The readme explains to run it
+- [ ] It meets all the requirements
+- [ ] It is testable
+    - the dependencies are properly inverted
+    - not using lifecycle methods
+
 ## Requirements
 - [ ] Profiles
     - [ ] Display all profiles
