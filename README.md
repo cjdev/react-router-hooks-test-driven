@@ -4,8 +4,10 @@
 - [ ] The readme explains to run it
 - [ ] It meets all the requirements
 - [ ] It is testable
-    - the dependencies are properly inverted
-    - not using lifecycle methods
+  - the dependencies are properly inverted
+  - not using lifecycle methods
+- [ ] Async calls are working reliably
+  - For example, when I add a profile or task, it immediately shows up without a refresh, every time
 
 ## Requirements
 - [ ] Profiles
