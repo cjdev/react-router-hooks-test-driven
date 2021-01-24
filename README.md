@@ -62,7 +62,7 @@ and any style that is harder to test should be changed in its design until it is
 
 ## Before running
 - `npm install`
-- Make sure [webdb](https://gitlab.cj.dev/training/webdb) is running, see instructions in that project
+- Make sure [webdb](https://github.com/cjdev/webdb) is running, see instructions in that project
 
 ## Scripts
 - `./sample-data.sh`
