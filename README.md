@@ -1,14 +1,22 @@
 # React Router Hooks (test driven)
 
-## For the onboarding exercise, make sure
+## Before running
 
-- [ ] The readme explains to run it
-- [ ] It meets all the requirements
-- [ ] It is testable
-  - the dependencies are properly inverted
-  - not using lifecycle methods
-- [ ] Async calls are working reliably
-  - For example, when I add a profile or task, it immediately shows up without a refresh, every time
+- `npm install`
+- Make sure [webdb](https://github.com/cjdev/webdb) is running, see instructions in that project
+
+## Scripts
+
+- `./scripts/sample-data.sh`
+  - create sample data for the application
+- `./scripts/prepare.sh`
+  - fetch dependencies for the application
+- `./scripts/run.sh`
+  - run the application
+- `./scripts/test.sh`
+  - test the application
+- `./scripts/coverage.sh`
+  - test coverage report for the application
 
 ## Requirements
 
@@ -46,7 +54,13 @@ You should know how write a front end application that handles all of the follow
 
 This is a fully test driven example project that shows one way of accomplishing this.
 
-## Style
+## Design Goals
+
+- Easy to compose
+- Easy to test
+- Easy for components to interact with each other without knowledge of implementation details
+
+## Design Style
 
 - Local state rather than centralized state
 - useState() hook rather than useReducer() hook
@@ -74,38 +88,9 @@ This is a fully test driven example project that shows one way of accomplishing 
   - add `"proxy": "http://localhost:8080"` to `package.json`
   - in `fetch` calls use `"task/"` as your baseline URL
 
-## Alternative Styles
-
-- See the branch for how
-  to [use a context as a service locator](https://gitlab.cj.dev/training/react-router-hooks-test-driven/tree/context-service-locator)
-- You can use the useReducer() hook rather than the useState() hook
-- It is possible to put all state in a single global object, managed by a hierarchy of reducers. This has the advantage
-  of making individual components so simple that all they do is render properties and fire events.
-
-Any style that facilitates test driven design equally well is equally valid, and any style that is harder to test should
-be changed in its design until it is at least as easy to test as the well-known and well-documented test driven styles.
-
 ## Original Readme File (generated)
 
 [README-generated.md](README-originally-generated.md)
-
-## Before running
-
-- `npm install`
-- Make sure [webdb](https://github.com/cjdev/webdb) is running, see instructions in that project
-
-## Scripts
-
-- `./scripts/sample-data.sh`
-    - create sample data for the application
-- `./scripts/prepare.sh`
-    - fetch dependencies for the application
-- `./scripts/run.sh`
-    - run the application
-- `./scripts/test.sh`
-    - test the application
-- `./scripts/coverage.sh`
-    - test coverage report for the application
 
 ## How this project was created
 
