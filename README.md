@@ -96,15 +96,15 @@ be changed in its design until it is at least as easy to test as the well-known 
 
 ## Scripts
 
-- `./sample-data.sh`
+- `./scripts/sample-data.sh`
     - create sample data for the application
-- `./prepare.sh`
+- `./scripts/prepare.sh`
     - fetch dependencies for the application
-- `./run.sh`
+- `./scripts/run.sh`
     - run the application
-- `./test.sh`
+- `./scripts/test.sh`
     - test the application
-- `./coverage.sh`
+- `./scripts/coverage.sh`
     - test coverage report for the application
 
 ## How this project was created
